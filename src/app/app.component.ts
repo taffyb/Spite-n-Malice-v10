@@ -5,7 +5,7 @@ import {PlayerService} from './services/player.service';
 import {GameService} from './services/game.service';
 import {Game, IGameModel} from './classes/games';
 import {IProfileModel, IPlayerModel} from 's-n-m-lib';
-import {MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import {ModalDialog, DialogOptions } from './modal-dialog/modal-dialog';
 
 import {ActivatedRoute, Router } from '@angular/router';

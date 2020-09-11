@@ -1,7 +1,7 @@
 import { Component, OnInit,Input,Output, EventEmitter } from '@angular/core';
 import { ProfileDialogComponent } from '../profile-dialog/profile-dialog.component';
 import { HelpDialogComponent } from '../help-dialog/help-dialog.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import {IProfileModel, DEFAULT_PROFILE, IPlayerModel} from 's-n-m-lib';
 import {ProfileService} from '../services/profile.service';
 
