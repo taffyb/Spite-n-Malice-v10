@@ -1,0 +1,98 @@
+
+.animation{
+	/*border:2px solid red;*/
+	position:absolute;
+}
+
+.player{
+	display:inline-flex;
+	padding-bottom:15px;
+	padding-right:30px;
+}
+/*
+.player.name{
+	position:relative;
+}
+.player.name.active{
+	color:#44d60b;
+}
+.player.name.inactive{
+	color:#a31217;
+}
+*/
+.container{
+	display:flex;
+	flex-flow:column;
+	border:solid black 1px;
+}
+.heading{
+	color:white;
+	width:100%;
+	border:solid black 1px;
+}
+.heading.active{
+	background:#44d60b;
+}
+.heading.inactive{
+	background:#a31217;
+}
+.player-pile{
+  	border-right:solid grey 5px;
+}
+.player-hand{
+	display:flex;
+  	flex-flow: row ;
+  	border-right:solid grey 5px;
+}
+.player-stacks {
+	display:flex;
+  	flex-flow: row ;
+  	/*border:black solid 1px;*/
+  	max-width:290px;
+}
+.game-row{
+	display:flex;
+	flex-flow:row;
+}
+.game-stacks{
+	display:flex;
+	flex-flow:row;
+	padding-left:25px;
+}
+/* Tooltip container */
+.tooltip {
+  float: left;
+  position: relative;
+  display: inline-block;
+  /*border-bottom: 1px dotted black; *//* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  opacity:0.6;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+ 
+
+/* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+#game-over{
+	text-align: center;
+}
+#game-over img{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}

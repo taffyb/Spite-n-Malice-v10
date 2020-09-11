@@ -1,0 +1,13 @@
+.game{
+	font-weight: bold;
+	font-color:white;
+}
+.game.active{
+	background:#44d60b;
+}
+.game.inactive{
+	background:#a31217;
+}
+.game.over{
+	background:#c0c0c0;
+}

@@ -1,0 +1,14 @@
+.player-stack-container{
+	display:flex;
+	flex-direction:column;
+	/*align-content: centre;*/
+	flex-wrap:nowrap;
+	max-height: 250px;
+	max-width: 72px;
+}
+.player-stack-item{
+	overflow:hidden;	
+}
+.player-stack-item:last-child, .player-stack-item:hover {
+    overflow: visible;
+}

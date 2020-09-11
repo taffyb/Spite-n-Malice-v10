@@ -1,0 +1,17 @@
+<div class="player-stack-container">
+	<div class="player-stack-item" *ngIf="cards.length==0;else HasCards">
+		<card id="pos{{pos}}" [options]="options" [pos]="pos" [cardNo]="0" (onSelect)="select($event)"></card>
+	</div>
+	<ng-template #HasCards>
+		<div class="player-stack-item" *ngFor="let card of cards;let cIdx=index" >
+			<card *ngIf="cards.length-1==cIdx" 
+					id="pos{{pos}}"  
+					[options]="options" 
+					[pos]="card.position" 
+					[cardNo]="card.cardNo"  
+					(onSelect)="select($event)">
+			 </card>
+			 <card *ngIf="cards.length-1>cIdx"  [pos]="card.position" [cardNo]="card.cardNo"></card>
+		</div>
+	</ng-template>
+</div>

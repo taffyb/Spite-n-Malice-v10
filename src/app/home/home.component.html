@@ -1,0 +1,33 @@
+
+<h1>Welcome {{player.name}}</h1>
+
+<div class="link" (click)="newGame()">New Local Game</div> 
+<!-- <a  routerLink="/play-area/{{game.uuid}}">Go to game</a> -->
+<p>
+<app-gauge [a]="{text:'Player 1',value:22}" [b]="{text:'Player 2',value:13}"></app-gauge>
+<p>
+<!-- <app-timezone-test></app-timezone-test>-->
+
+
+Pending Invitations:
+<ul>
+	<li *ngFor="let invite of invitations">
+		<app-invitation [invite]="invite" 
+						(onAccept)="sendInviteResponse('accept',$event)" 
+						(onDecline)="sendInviteResponse('decline',$event)">
+		</app-invitation>
+	</li>
+</ul>
+Opponents:
+<ul *ngIf="opponents$ | async as opponents; else loading">
+	<li *ngFor="let opponent of opponents">
+		<app-opponent [player]="player" [opponent]="opponent" (onInvite)="sendInvite($event)"></app-opponent>
+	</li>
+</ul>
+Games:
+<ul *ngIf="games$ | async as games else loading">
+	<li *ngFor="let game of games">
+ 		<app-game-item [game]="game" ></app-game-item> 
+	</li>
+</ul>
+<ng-template #loading>Loading ...</ng-template>

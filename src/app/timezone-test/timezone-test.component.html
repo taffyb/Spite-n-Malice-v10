@@ -1,0 +1,8 @@
+<p>report works!</p>
+
+<ul *ngIf="locations$ |async as locations;else loading">
+	<li *ngFor="let l of locations" (click)="addTimeZone(l.timezone)" >{{l.timezone}} 
+	<div *ngIf="timezones[l.timezone]">{{timezones[l.timezone].abbreviation}} DLS={{timezones[l.timezone].dst}}</div></li>
+</ul>
+
+<ng-template #loading>Loading ...</ng-template>

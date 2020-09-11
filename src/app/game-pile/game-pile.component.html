@@ -1,0 +1,14 @@
+<ng-container *ngIf="cards.length==0">
+	<div class="pile-item" >
+		<card [pos]="pos" [cardNo]="0" [options]="options" (onSelect)="select($event)"></card>
+	</div>
+</ng-container>
+<ng-container *ngIf="cards.length>0">	
+	<div class="pile-item" >
+		<card [options]="options" 
+			  [pos]="pos" 
+			  [cardNo]="getFaceNumber(cards.length-1)" 
+			  (onSelect)="select($event)">
+		</card>
+	</div>
+</ng-container>
