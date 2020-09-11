@@ -1,7 +1,0 @@
-<div>
-	<span class='game' [ngClass]="{'active':isMyTurn(),'inactive':!isMyTurn()}"> 
-		{{game.name}} [{{gameStatesEnum[game.state]}}] 
-	</span>&nbsp;
-	<a  routerLink="/play-area/{{game.uuid}}">open</a> &nbsp;
-	<a  routerLink="/move-rpt/{{game.uuid}}">reports</a>
-</div>
