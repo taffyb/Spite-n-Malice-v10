@@ -1,0 +1,10 @@
+<div class="burger-menu mat-app-background basic-container">
+	<mat-menu #appMenu="matMenu" xPosition="before" >
+	  <button mat-menu-item (click)="onSettings()">Settings</button>
+	  <button mat-menu-item (click)="onHelp()">Help</button>
+	</mat-menu>
+
+	<button mat-icon-button [matMenuTriggerFor]="appMenu">
+	  <mat-icon>more_vert</mat-icon>
+	</button>
+</div>

@@ -1,0 +1,22 @@
+<div *ngIf="profile$ | async as profile; else splash">
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+		  <div class="navbar-header">
+			<a class="navbar-brand" href="/">Compare Yourself!</a>
+		  </div>
+		  <div class="navbar-default">
+			<ul class="nav navbar-nav">
+			  <li >Compare</li>
+			  <li >Logout</li>
+			  <li >Sign In</li>
+			  <li >Sign Up</li>
+			</ul>
+		  </div>
+		</div>
+	</nav>
+	<app-burger-menu  [profile]="profile" [player]="player"></app-burger-menu>
+	<router-outlet></router-outlet>
+</div>
+<ng-template #splash>
+	<app-splash (onLogin)="loadProfile($event)" (onGuestEntry)="guestEntry()"></app-splash>
+</ng-template>

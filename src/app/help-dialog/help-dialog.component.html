@@ -1,0 +1,55 @@
+
+<mat-tab-group>
+	<mat-tab label="Rules">
+	    <div class="tab-content">
+			<p>The object of the game is to be the first Player to play all the
+				cards in your pile. This is done by playing them onto the Centre Stacks.</p>
+			<p>The first card played on a Centre Stack must be an ace, then 2, 3,
+				and so on, in sequence up to King, each card played being one higher
+				than the card it covers. There cannot be more than four Centre Stacks
+				at one time.</p>
+			<p>The Player Stacks can contain cards in any order, and when
+				playing to these stacks you may put your card on whichever stack you
+				choose. The only limitation is that you cannot have more than four
+				stacks.</p>
+			<p>The Player who has the lowest card showing on their pile (lowest card in-hand is used as
+				 a tie breaker) plays first, thereafter the Players take alternate turns.</p>
+			<p>To play; the active Player (whose name is underlined and in red) must select
+				the card they wish to move (it becomes highlighted blue when clicked), then select
+				the target location (possible locations will highlight yellow when
+				hovered).</p>
+			<p>When all four Player Stacks have at least 1 card, and a card is moved from the Player's 
+				hand to one of the Player Stacks, this is considered a Discard.</p>
+			<p>You must fill all four positions in your Player Stacks before you can discard an extra card to end your turn.</p>
+			<p>A turn may consist of multiple moves, and is finished when the Player discards.</p>
+			<p>During a turn, if all of the cards in the Player's Hand are used before they Discard, 
+				the dealer will refill their hand, and they may continue to make moves until they have to discard.</p>
+			<p>The dealer will ensure that a Player's hand is full at the beginning of each turn.</p>
+			<p>There are four Jokers in play. These are treated as wild cards and will become the next card in 
+				sequence when played on a Centre Stack. When added to a Player Stack they remain a Joker and can not be played until
+				any covering card has been played, as is the case with any other card.</p>
+	    </div>
+	</mat-tab>
+	<mat-tab label="Starting a Game">
+	    <div class="tab-content">
+			<ol>
+				<li>Enter a Name for your game (optional - defaults to 'new')</li>
+				<li>Select a Player from the list for Player 1 (currently there is no ability to create new users - under development)</li>
+				<li>Select a Player from the list for Player 2</li> 
+				<li>Click 'Play' (only becomes clickable when Name and Player 1 & 2 are set)</li>
+			</ol>
+			<p>Once a game is complete (or before, if you want to quit), click on the 'X' beside 
+				the name of the game in the tab bar to close the game. Click on the 'Dashboard' tab to return to 
+				the home page where you can start another game.</p>
+			<p><a id="auto-player"><h2>Auto Players:</h2></a>
+			<p>A special 'player' is included that you can play against. The 'Robot.' player will play against you 
+			(or itself if you set player1 and player 2 as Robot.).
+			<p>When using the Robot, start the game as normal. When it is the Robot players turn it's name will be highlighted. 
+			Simply click the name to perform a move. Repeatidly click the name until the Robot discards and play swaps to the other player.
+	    </div>
+	</mat-tab>
+	<mat-tab label="About">
+	    <div class="tab-content">
+	    </div>
+	</mat-tab>
+</mat-tab-group>

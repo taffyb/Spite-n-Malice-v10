@@ -1,0 +1,23 @@
+<!-- dialog-modal-example.component.html -->
+<h2 *ngIf="title">{{title}}</h2>
+<img *ngIf="showQuestionIcon" class="icon-small" src="/assets/Question.svg"/>
+<img *ngIf="showInfoIcon" class="icon-small" src="/assets/Info.svg"/>
+<img *ngIf="showWarningIcon" class="icon-small" src="/assets/Warning.svg"/>
+{{message}}
+<div *ngIf="isInputBox">
+  <mat-form-field>
+    <input matInput [(ngModel)]="fromDialog" placeholder="{{placeholder}}">
+  </mat-form-field>
+</div>
+<div class="button-row" >
+  <button *ngIf="showOk" 
+  	mat-raised-button (click)="closeDialog(dialogOptionsEnum.OK)">OK</button>
+  <button *ngIf="showClose" 
+  	mat-raised-button (click)="closeDialog(dialogOptionsEnum.CLOSE)">Close</button>
+  <button *ngIf="showCancel" 
+  	mat-raised-button (click)="closeDialog(dialogOptionsEnum.CANCEL)">Cancel</button>
+</div>
+<div class="button-row" *ngIf="showYesNo">
+  <button  mat-raised-button (click)="closeDialog(dialogOptionsEnum.OK)">YES</button>
+  <button  mat-raised-button (click)="closeDialog(dialogOptionsEnum.CANCEL)">NO</button>
+</div>

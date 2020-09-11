@@ -1,0 +1,10 @@
+{{invite.from.name}} asked "Would you like to play a game?" 
+<span class="link" (click)="accept()">
+	<img src="./assets/thumbs-up.png"  height="32" width="32" alt="Accept">
+</span>
+&nbsp; 
+<span class="link" (click)="decline()">
+	<img src="./assets/thumbs-down.png"  height="32" width="32" alt="Declinet">
+</span>
+<br/>
+<small>@{{invite.timestamp | date:'short'}}</small>
