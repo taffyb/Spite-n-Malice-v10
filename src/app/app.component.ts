@@ -1,14 +1,16 @@
 import {Component,OnInit } from '@angular/core';
 import {Observable, of} from 'rxjs';
+import {AuthService} from './services/auth.service';
+import {AuthTypesEnum} from './enums';
 import {ProfileService} from './services/profile.service';
 import {PlayerService} from './services/player.service';
 import {GameService} from './services/game.service';
 import {Game, IGameModel} from './classes/games';
-import {IProfileModel, IPlayerModel} from 's-n-m-lib';
+import {IProfileModel, IPlayerModel, GameStatesEnum} from 's-n-m-lib';
 import { MatDialog } from '@angular/material/dialog';
 import {ModalDialog, DialogOptions } from './modal-dialog/modal-dialog';
 
-import {ActivatedRoute, Router } from '@angular/router';
+import {ActivatedRoute, Router, NavigationStart } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -16,22 +18,48 @@ import {ActivatedRoute, Router } from '@angular/router';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
+    title:string="Spite-Malice-v10";
+    links: any[] =[];
     profile$:Observable<IProfileModel>;
-    player:IPlayerModel;
-    title:string="Spite-Malice-v9";
-//    game:Game;
+    authTypes = AuthTypesEnum;
+    authStatus: AuthTypesEnum = AuthTypesEnum.UNAUTHENTICATED;
+    selectedTab:number=0;
 
     constructor(
             private router: Router,
             private playerSvc:PlayerService,
             private profileSvc:ProfileService,
             private gameSvc:GameService,
-            public dialog: MatDialog){
+            public dialog: MatDialog,
+            private authSvc: AuthService){
+        authSvc.authStatusChanged.subscribe((status) => {
+            this.authStatus = status;
+        });
+        gameSvc.statusChanged.subscribe((change) => {
+            const label: string = change.game.name;
+            switch(change.status){
+                case GameStatesEnum.NEW:
+                    this.links.push({label: label,target:`play-area/${change.game.uuid}`,visible:true});
+            }
+        });
+        router.events.subscribe((event)=>{
+            if(event instanceof NavigationStart){
+                let eventUrl = event.url;
+                eventUrl=eventUrl.substr(1,eventUrl.length-1);
+                this.links.forEach((l,i)=>{
+                    if(l.target==eventUrl){
+                        this.selectedTab=i;
+                    }
+                });
+            }
+            
+        });
         console.log(`AppComponent: Constructor`);
     }
     
     ngOnInit(){
-//        console.log(`AppComponent: ngOnInit`);
+       this.links.push({label: 'Welcome',target:'welcome',visible:true});
+       this.links.push({label: 'Home',target:'home',visible:this.authStatus==AuthTypesEnum.AUTHENTICATED});
     }
 
    async loadProfile(player){
@@ -41,10 +69,5 @@ export class AppComponent implements OnInit {
             this.router.navigate(['/home']);
         }
     }
-    async guestEntry(){
-        this.player = await this.playerSvc.getPlayerByName$("Player1").toPromise();
-        this.profile$=this.profileSvc.getDefaultProfile$();
-        const game:IGameModel = this.gameSvc.newGame("new",this.player.uuid,"222222",true); 
-        this.router.navigate([`/play-area/${game.uuid}`]);
-    }
+
 }

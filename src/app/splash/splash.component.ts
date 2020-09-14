@@ -1,8 +1,15 @@
 import { Component, OnInit,Output, EventEmitter } from '@angular/core';
+import {ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+
+import {Observable, of} from 'rxjs';
 import { ModalDialog, DialogOptions } from '../modal-dialog/modal-dialog';
-import {IPlayerModel} from 's-n-m-lib';
+import {IPlayerModel, IGameModel, IProfileModel} from 's-n-m-lib';
 import {PlayerService} from '../services/player.service';
+import {ProfileService} from '../services/profile.service';
+import {GameService} from '../services/game.service';
+import {AuthService} from '../services/auth.service';
+import {AuthTypesEnum} from '../enums';
 
 @Component({
   selector: 'app-splash',
@@ -11,11 +18,15 @@ import {PlayerService} from '../services/player.service';
 })
 export class SplashComponent implements OnInit {
   @Output()onLogin:EventEmitter<IPlayerModel> = new EventEmitter<IPlayerModel>();
-  @Output()onGuestEntry:EventEmitter<boolean> = new EventEmitter<boolean>();
   
   constructor(
-          private playerSvc:PlayerService,
-          public dialog: MatDialog) { }
+    private router: Router,
+    private playerSvc:PlayerService,
+    private profileSvc:ProfileService,
+    private gameSvc:GameService,
+    private authSvc:AuthService,
+    public dialog: MatDialog) 
+  { }
 
   ngOnInit() {
   }
@@ -47,7 +58,11 @@ export class SplashComponent implements OnInit {
                            DialogOptions.INPUT;
       this.openDialog(msg,options);        
   }
-  enterAsGuest(){
-      this.onGuestEntry.emit(true); 
+  async guestEntry(){
+    this.authSvc.setAuthType(AuthTypesEnum.GUEST);
+    const player = await this.playerSvc.getPlayerByName$("Player1").toPromise();
+    const profile$:Observable<IProfileModel> = this.profileSvc.getDefaultProfile$();
+    const game:IGameModel = this.gameSvc.newGame("game",player.uuid,"222222",true); 
+    this.router.navigate([`/play-area/${game.uuid}`]);
   }
 }

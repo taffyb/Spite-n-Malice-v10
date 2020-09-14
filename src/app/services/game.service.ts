@@ -3,7 +3,7 @@ import {ICardModel, Card, IPlayerModel} from 's-n-m-lib';
 import {PositionsEnum, CardsEnum,GameStatesEnum} from 's-n-m-lib';
 import {DealerService} from './dealer.service';
 import {Injectable} from '@angular/core';
-import {Observable, of} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import {HttpClient} from "@angular/common/http";
 import * as common from './service.common';
 
@@ -12,7 +12,7 @@ import * as common from './service.common';
 })
 export class GameService{
     _games={};
-    
+    statusChanged: Subject<{status:GameStatesEnum, game: IGameModel}> = new Subject<{status:GameStatesEnum, game: IGameModel}>();
     constructor(private http:HttpClient, 
                 private dealerSvc:DealerService){
         console.log(`GameService.constructor`);
@@ -60,6 +60,7 @@ export class GameService{
         const g:IGameModel=GameFactory.newGame(name,player1Uuid, player2Uuid,deck,local);
         const game:Game=Game.fromModel(g);
         this._games[game.uuid]=game;
+        this.statusChanged.next({status: GameStatesEnum.NEW, game: game});
         this.saveGame(game);
         return game;
     }
