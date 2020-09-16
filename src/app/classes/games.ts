@@ -8,7 +8,7 @@ import {MoveTypesEnum , GameStatesEnum, PositionsEnum} from 's-n-m-lib';
 export class Game extends libGame{
     stats:{players:{turns:number,moves:number}[]}={players:[{turns:0,moves:0},{turns:0,moves:0}]};
     stateEmitter:Subscriber<GameStatesEnum>;  
-
+    lastMoveId:number=0;
     private constructor(){super();}
     
     static fromModel(model:any):Game{
@@ -35,7 +35,10 @@ export class Game extends libGame{
             let stats=this.stats.players[this.activePlayer];
             stats.moves+=1;
         }
-        super.performMove(move);
+        if(move.id>this.lastMoveId){
+            super.performMove(move);
+            this.lastMoveId=move.id;
+        }
         if(this.cards[PositionsEnum.PLAYER_PILE+(this.activePlayer*10)].length==0){
             this.state= GameStatesEnum.GAME_OVER;
             this.stateEmitter.next(this.state);

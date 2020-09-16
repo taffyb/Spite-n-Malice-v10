@@ -27,6 +27,7 @@ import { GaugeComponent } from './gauge/gauge.component';
 import { OpponentComponent } from './opponent/opponent.component';
 
 import { AngularPageVisibilityModule } from 'angular-page-visibility';
+import { GameExplorerComponent } from './game-explorer/game-explorer.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { AngularPageVisibilityModule } from 'angular-page-visibility';
     GaugeComponent,
     OpponentComponent,
     GameItemComponent,
-    InvitationComponent
+    InvitationComponent,
+    GameExplorerComponent
   ],
   imports: [
     BrowserModule,

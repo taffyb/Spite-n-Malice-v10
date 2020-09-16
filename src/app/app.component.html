@@ -1,17 +1,4 @@
 <nav mat-tab-nav-bar >
-	<!--
-    <a mat-tab-link
-        [routerLink]="'welcome'">Welcome</a>
-    <a mat-tab-link
-		*ngIf="authStatus == authTypes.AUTHENTICATED"
-		[routerLink]="'home'">Home</a>
-    <a mat-tab-link
-		*ngIf="authStatus != authTypes.UNAUTHENTICATED"
-		[routerLink]="'play-area'">Play Area</a>
-	<a mat-tab-link
-		*ngIf="authStatus != authTypes.UNAUTHENTICATED"
-		[routerLink]="'settings'">Settings</a>
-	-->
 	<ng-container *ngFor="let link of links; let i=index">
 		<a mat-tab-link *ngIf="link.visible"
 			[ngClass]="{'selected':selectedTab===i}"

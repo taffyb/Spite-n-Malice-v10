@@ -1,0 +1,17 @@
+<div>
+    Game: {{game.uuid}}<br>
+    Cards In Play: {{totalCardsInPlay()}} 
+    <p></p>
+    Player 1:
+    <ul>
+        <li *ngFor="let i of [0,1,2,3,4,5,6,7,8,9]">{{PE[i]}} {{game.cards[i].length}} {{cardsAsList(game.cards[i])}}</li>
+    </ul>
+    Player 2:
+    <ul>
+        <li *ngFor="let i of [0,1,2,3,4,5,6,7,8,9]">{{PE[i]}} {{game.cards[i+10].length}} {{cardsAsList(game.cards[i+10])}}</li>
+    </ul>
+    Game:
+    <ul>
+        <li *ngFor="let i of [20,21,22,23,24,25]">{{PE[i]}} {{game.cards[i].length}} {{cardsAsList(game.cards[i])}}</li>
+    </ul>
+</div>

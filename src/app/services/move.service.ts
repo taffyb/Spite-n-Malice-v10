@@ -1,4 +1,4 @@
-import {Observable, of} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import { map } from 'rxjs/operators';
 import {IGameModel, Game} from '../classes/games';
 import {IMoveModel,IPlayerModel,Player, Move} from 's-n-m-lib';
@@ -14,16 +14,16 @@ import {PlayerService} from './player.service';
   providedIn: 'root',
 })
 export class MoveService{
-   private _moves:IMoveModel[][]=[]; //key by game UUID so can hold the moves for multiple games at same time.
-   private _moveSubscribers:IMoveSubscriber[]=[];
-
-    constructor(private http:HttpClient,
-            private wsSvc:WsService,
-            private playerSvc:PlayerService){
+    private _moves:IMoveModel[][] = []; //key by game UUID so can hold the moves for multiple games at same time.
+ 
+    // private subscribers={};
+    constructor(private http: HttpClient,
+            private wsSvc: WsService,
+            private playerSvc: PlayerService){
         console.log(`MoveService.constructor`);
  
     }
-
+    $onMoves: Subject<{gameUuid: string, moves: IMoveModel[]}> = new Subject<{gameUuid: string, moves: IMoveModel[]}>();
     init(){
         if( this.wsSvc.connected){
             this.wsSvc.onRecieveMoves$().subscribe({
@@ -35,32 +35,34 @@ export class MoveService{
             }); 
         }
     }
-    subscribe(subscriber:IMoveSubscriber){
-        //Potential for a subscriber to be added more than once!
-        this._moveSubscribers.push(subscriber); 
-    }
-    publishMoves(gameUuid:string,ms:IMoveModel[]){
-        this._moveSubscribers.forEach(s=>{
-            new Promise((resolve,reject)=>{
-                s.performMoves(gameUuid,ms);
-                resolve(true);
-            });
-        });
-    }
-    
-    addMove(game:IGameModel,playerUuid:string,m:IMoveModel){
-        let moves:IMoveModel[]=[];
+    // subscribeToMoves(gameUuid: string, callback:(ms:{gameUuid: string,  moves: IMoveModel[]}) => any){
+    //     if(!this.subscribers[gameUuid]){
+    //         this.subscribers[gameUuid] = callback
+    //     }
+    // }
+    publishMoves(gameUuid: string,ms: IMoveModel[]){
+        const movesToPublish = {gameUuid: gameUuid, moves: ms}
+        // console.log(`MoveService.publishMoves ${JSON.stringify(movesToPublish)}`);
+        // for(let key in this.subscribers){
+        //     if(key == gameUuid){
+        //         this.subscribers[key]({gameUuid:gameUuid,moves:ms});
+        //     }
+        // }
+        this.$onMoves.next(movesToPublish);
+    }    
+    addMove(game: IGameModel, playerUuid: string, m: IMoveModel){
+        let moves: IMoveModel[] = [];
         moves.push(m);
-        this.addMoves(game,playerUuid,moves);
+        this.addMoves(game, playerUuid, moves);
     }
-    addMoves(game:IGameModel,playerUuid:string,ms:IMoveModel[]){
+    addMoves(game: IGameModel, playerUuid: string, ms: IMoveModel[]){
 
-        let moves:IMoveModel[];
+        let moves: IMoveModel[];
         if(!this._moves[game.uuid]){
-            moves=[];
-            this._moves[game.uuid]=moves;
+            moves = [];
+            this._moves[game.uuid] = moves;
         }else{
-            moves=this._moves[game.uuid];
+            moves = this._moves[game.uuid];
         }
         ms.forEach(m=>{
             m.gameUuid=game.uuid;
@@ -83,7 +85,7 @@ export class MoveService{
             this.saveMoves(game.uuid,ms);
         }
     }
-    saveMoves(gameUuid:string,ms:IMoveModel[]){
+    saveMoves(gameUuid: string,ms: IMoveModel[]){
         ms.forEach((move)=>{   
             this.http.post<IMoveModel>(`${common.endpoint}games/${gameUuid}/moves`,move).subscribe(
                 (val) => {
@@ -97,15 +99,15 @@ export class MoveService{
                 });
          });
     }
-    moveToRecycle(game:Game,position:number){
+    moveToRecycle(game: Game, position: number){
         const moves:IMoveModel[]=[];
-        for(let i=game.getCards(position).length-1;i>=0;i--){
-            let c=game.getCards(position)[i];
+        for(let i = game.getCards(position).length-1; i>=0; i--){
+            let c = game.getCards(position)[i];
             let m = new Move();
-            m.card=c.cardNo;
-            m.from=position;
-            m.to=PositionsEnum.RECYCLE;
-            m.type=MoveTypesEnum.RECYCLE;
+            m.card = c.cardNo;
+            m.from = position;
+            m.to = PositionsEnum.RECYCLE;
+            m.type = MoveTypesEnum.RECYCLE;
             moves.push(m);
         }
         this.addMoves(game,"",moves);
@@ -117,7 +119,7 @@ export class MoveService{
                 const moves:IMoveModel[]=[];
                 data.forEach((m)=>{
 //                    console.log(`getMoves$ move:${JSON.stringify(m)}`);
-                    const move:IMoveModel=Move.fromModel(m);
+                    const move: IMoveModel = Move.fromModel(m);
                     moves.push(move);
                 });
                 return moves;

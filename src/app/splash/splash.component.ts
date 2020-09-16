@@ -45,8 +45,10 @@ export class SplashComponent implements OnInit {
         let name = result.data.input;
         if(result.data.option == DialogOptions.OK && name.length>0){
             console.log(`login Dialog name:${name}`);
-            let player:IPlayerModel = await this.playerSvc.getPlayerByName$(name).toPromise();
-            this.onLogin.emit(player); 
+            this.playerSvc.getPlayerByName$(name).subscribe((player)=>{
+              this.authSvc.setAuthType(AuthTypesEnum.AUTHENTICATED);
+              this.router.navigate([`/home`]);
+            });
         }
       });
   }

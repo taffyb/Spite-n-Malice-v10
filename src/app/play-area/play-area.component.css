@@ -1,25 +1,19 @@
 
 .animation{
-	/*border:2px solid red;*/
 	position:absolute;
 }
-
+#game-explorer{
+	width: 50%;
+	border: 1px solid black;
+	position:absolute;
+	top:48px;
+	right:0;
+}
 .player{
 	display:inline-flex;
 	padding-bottom:15px;
 	padding-right:30px;
 }
-/*
-.player.name{
-	position:relative;
-}
-.player.name.active{
-	color:#44d60b;
-}
-.player.name.inactive{
-	color:#a31217;
-}
-*/
 .container{
 	display:flex;
 	flex-flow:column;

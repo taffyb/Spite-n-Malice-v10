@@ -1,5 +1,7 @@
 a.selected{
   background: rgba(63, 104, 216, 0.562);
+  font-weight: bold;
+  font-style: italic;
 }
 .loader,
 .loader:after {

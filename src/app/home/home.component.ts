@@ -26,6 +26,7 @@ export class HomeComponent implements OnInit {
           private wsSvc:WsService) {
       console.log(`HomeComponent: Constructor`);
       this.player = playerSvc.getActivePlayer();
+      console.log(`Player: ${JSON.stringify(this.player)}`);
       this.games$= gameSvc.getGames$(this.player.uuid,3);
       this.opponents$=playerSvc.getOpponents$(this.player.uuid);
       wsSvc.connect();
