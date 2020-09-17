@@ -418,7 +418,7 @@ export class PlayAreaComponent implements OnInit {
               case this.pE.STACK_2:
               case this.pE.STACK_3:
               case this.pE.STACK_4:
-                let topOfPile=SMUtils.getFaceNumber(this.game.getCards(position),this.game.getCards(position).length-1);
+                let topOfPile=SMUtils.toFaceNumber(SMUtils.getFaceNumber(this.game.getCards(position),this.game.getCards(position).length-1));
 
                 opt.selectableTo= (topOfPile==(SMUtils.toFaceNumber(this.from.cardNo)-1) ||
                 SMUtils.toFaceNumber(this.from.cardNo)==this.cE.JOKER);

@@ -41,7 +41,6 @@
 .player-stacks {
 	display:flex;
   	flex-flow: row ;
-  	/*border:black solid 1px;*/
   	max-width:290px;
 }
 .game-row{
@@ -57,8 +56,6 @@
 .tooltip {
   float: left;
   position: relative;
-  display: inline-block;
-  /*border-bottom: 1px dotted black; *//* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */

@@ -7,9 +7,6 @@ import * as common from './service.common';
 import {IProfileModel,DEFAULT_PROFILE,IPlayerModel} from 's-n-m-lib';
 import {Location, TimeZone} from '../classes/timezones'
 
-
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -27,6 +24,7 @@ export class ProfileService {
     this.playerGuid=playerGuid;
     if(!this._profile){
         this._profile = DEFAULT_PROFILE;
+        this._profile.showStatistics=false;
     }
     o= of(this._profile);
     return o;
@@ -36,6 +34,7 @@ export class ProfileService {
   }
   getDefaultProfile$():Observable<IProfileModel>{
       this._profile=DEFAULT_PROFILE;
+      this._profile.showStatistics=false;
       return of(this._profile);
   }
   

@@ -50,6 +50,7 @@
 			<div 
 				 *ngFor="let player of players; let pIdx=index">
 				 {{player.name}}<br>
+
 				<div class="player">
 					<div class="container">
 						<div  class="heading" [ngClass]="{'active':game.activePlayer==pIdx,
@@ -104,6 +105,8 @@
 					</div>
 				</div>
 			</div>
+		</div>
+		<div>	
 			<div class="game-row">
 				<div class="game-deck tooltip" >
 					<span class="tooltiptext">{{game.getCards(pE.DECK).length}}</span>
@@ -137,7 +140,7 @@
 		</div>
 		<ng-template #loadingHand>Loading players hands...</ng-template>
 	</div>
-	<div id="game-explorer">
+	<!-- <div id="game-explorer">
 		<app-game-explorer [game]="game"></app-game-explorer>
-	</div>
+	</div> -->
 </div>
