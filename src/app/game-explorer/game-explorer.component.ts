@@ -35,4 +35,15 @@ export class GameExplorerComponent implements OnInit {
     });
     return count;
   }
+  countCards(cardNo:number):number{
+    let count:number=0;
+    this.game.cards.forEach((pile:ICardModel[],i)=>{
+      pile.forEach((card:ICardModel,j)=>{
+        if(SMUtils.toFaceNumber(card.cardNo) == cardNo){
+          count++;
+        }
+      });        
+    });
+    return count;
+  }
 }

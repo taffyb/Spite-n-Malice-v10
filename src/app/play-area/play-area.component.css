@@ -13,6 +13,7 @@
 	display:inline-flex;
 	padding-bottom:15px;
 	padding-right:30px;
+	min-height: 260px;
 }
 .container{
 	display:flex;
