@@ -34,12 +34,13 @@ export class AppComponent implements OnInit {
             private authSvc: AuthService){
         authSvc.authStatusChanged.subscribe((status) => {
             this.authStatus = status;
+            console.log(`Auth Status: ${AuthTypesEnum[this.authStatus]}`);
         });
         gameSvc.statusChanged.subscribe((change) => {
             const label: string = change.game.name;
             switch(change.status){
                 case GameStatesEnum.NEW:
-                    this.links.push({label: label,target:`play-area/${change.game.uuid}`,visible:true});
+                    this.links.push({label: label,target:`play-area/${change.game.uuid}`,visible:true,allowClose:true});
             }
         });
         router.events.subscribe((event)=>{
@@ -56,10 +57,21 @@ export class AppComponent implements OnInit {
         });
         console.log(`AppComponent: Constructor`);
     }
-    
+    close(linkTarget:string){
+        let previousLink:string;
+        this.links.forEach((l,i)=>{
+            if(l.target==linkTarget){
+                this.router.navigate([previousLink]);
+                console.log(`Navigate to : ${previousLink}`);
+                this.links.splice(i,1);
+            }else{
+                previousLink= l.target;
+            }
+        });
+    }
     ngOnInit(){
-       this.links.push({label: 'Welcome',target:'welcome',visible:true});
-       this.links.push({label: 'Home',target:'home',visible:this.authStatus==AuthTypesEnum.AUTHENTICATED});
+       this.links.push({label: 'Welcome',target:'welcome'});
+       this.links.push({label: 'Home',target:'home'});
     }
 
    async loadProfile(player){
@@ -69,5 +81,23 @@ export class AppComponent implements OnInit {
             this.router.navigate(['/home']);
         }
     }
-
+    isVisible(targetUrl:string):boolean{
+        let visible=false;
+        const target:string = targetUrl.split('/')[0];
+        switch(target){
+            case 'welcome':
+                visible=true;
+                break;
+            case 'home':
+                visible=this.authStatus===AuthTypesEnum.AUTHENTICATED;
+                break;
+            case 'play-area':
+                visible=this.authStatus!=AuthTypesEnum.UNAUTHENTICATED;
+                break;
+            case 'settings':
+                visible=this.authStatus===AuthTypesEnum.AUTHENTICATED;
+                break;
+        }
+        return visible;
+    }
 }

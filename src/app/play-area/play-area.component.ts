@@ -251,7 +251,7 @@ export class PlayAreaComponent implements OnInit {
                     //IF just added a KING to a Game Stack, move to recycle
                     if(to>=this.pE.STACK_1 && 
                        to<=this.pE.STACK_4 && 
-                       (SMUtils.toFaceNumber(SMUtils.getTopOfStack(this.game.getCards(to)))== this.cE.KING)
+                       (SMUtils.toFaceNumber(SMUtils.toFaceNumber(SMUtils.getTopOfStack(this.game.getCards(to))))== this.cE.KING)
                       ){
                         if(this.game.local || this.playerSvc.getActivePlayer().uuid==movingPlayerUuid){
                             this.moveSvc.moveToRecycle(this.game,to);
