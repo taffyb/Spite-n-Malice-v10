@@ -57,23 +57,25 @@ export class AppComponent implements OnInit {
         });
         console.log(`AppComponent: Constructor`);
     }
-    close(linkTarget:string){
-        let previousLink:string;
-        this.links.forEach((l,i)=>{
-            if(l.target==linkTarget){
-                this.router.navigate([previousLink]);
-                console.log(`Navigate to : ${previousLink}`);
-                this.links.splice(i,1);
-            }else{
-                previousLink= l.target;
-            }
-        });
-    }
     ngOnInit(){
        this.links.push({label: 'Welcome',target:'welcome'});
        this.links.push({label: 'Home',target:'home'});
     }
 
+    close(linkTarget:string){
+        let previousLink:string;
+        this.links.forEach((l,i)=>{
+            if(this.isVisible(l.target)){
+                if(l.target==linkTarget){
+                    this.router.navigate(['/'+previousLink]);
+                    this.links.splice(i,1);
+                }else{
+                    previousLink= l.target;
+                }
+            }
+        });
+        return false; // return false so click does not bubble to tab.
+    }
    async loadProfile(player){
        console.log(`AppComponent.loadProfile player:${JSON.stringify(player)}`);
         if(player)  {          
