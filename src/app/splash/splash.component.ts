@@ -9,7 +9,7 @@ import {PlayerService} from '../services/player.service';
 import {ProfileService} from '../services/profile.service';
 import {GameService} from '../services/game.service';
 import {AuthService} from '../services/auth.service';
-import {AuthTypesEnum} from '../enums';
+import {AuthTypesEnum} from '../classes/auth.enums';
 
 @Component({
   selector: 'app-splash',

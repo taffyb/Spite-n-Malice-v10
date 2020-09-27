@@ -1,7 +1,7 @@
 import {Component,OnInit } from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {AuthService} from './services/auth.service';
-import {AuthTypesEnum} from './enums';
+import {AuthTypesEnum} from './classes/auth.enums';
 import {ProfileService} from './services/profile.service';
 import {PlayerService} from './services/player.service';
 import {GameService} from './services/game.service';

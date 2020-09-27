@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {AuthTypesEnum} from '../enums';
+import {AuthTypesEnum} from '../classes/auth.enums';
 import { Subject, Observable } from 'rxjs';
 
 @Injectable({
