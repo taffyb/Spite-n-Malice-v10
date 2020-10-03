@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import {AuthTypesEnum} from '../classes/auth.enums';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 
-// import {
-//   CognitoUserPool,
-//   CognitoUserAttribute,
-//   CognitoUser,
-//   AuthenticationDetails,
-//   CognitoUserSession
-// } from 'amazon-cognito-identity-js';
+import {
+  CognitoUserPool,
+  CognitoUserAttribute,
+  CognitoUser,
+  AuthenticationDetails,
+  CognitoUserSession
+} from 'amazon-cognito-identity-js'; 
 
 @Injectable({
   providedIn: 'root'
