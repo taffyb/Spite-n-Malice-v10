@@ -1,0 +1,11 @@
+patch-package
+--- a/node_modules/crypto-browserify/rng.js
++++ b/node_modules/crypto-browserify/rng.js
+@@ -1,7 +1,7 @@
+ // Original code adapted from Robert Kieffer.
+ // details at https://github.com/broofa/node-uuid
+ (function() {
+-  var _global = this;
++  var _global = this || window || {};
+ 
+   var mathRNG, whatwgRNG;
