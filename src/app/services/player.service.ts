@@ -5,6 +5,7 @@ import { map, catchError, tap } from 'rxjs/operators';
 
 import * as common from './service.common';
 import {WsService} from './ws.service';
+import {ProfileService} from './profile.service';
 import {IPlayerModel,Opponent} from 's-n-m-lib';
 
 @Injectable({
@@ -27,7 +28,8 @@ export class PlayerService {
   private _opponentObserver:any;
 
   constructor(private http:HttpClient,
-              private wsSvc:WsService) {
+              private wsSvc:WsService,
+              private profileSvc:ProfileService) {
     console.log(`PlayerService.constructor`);
     wsSvc.onPlayerActive$().subscribe({
         next:(p:IPlayerModel)=>{
@@ -76,8 +78,11 @@ export class PlayerService {
       let player$:Observable<IPlayerModel>;
       if(!this._activePlayer){
           this._players.forEach(p=>{
-              if(p.name==name){
+              if(p.name===name){
                   this._activePlayer=p;
+                  this.profileSvc.getProfile$(p.uuid).subscribe((profile)=>{
+                      console.log(`Loaded profile for user: ${p.name}`);
+                  });
               }
           });
       }

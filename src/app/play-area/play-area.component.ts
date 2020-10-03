@@ -68,18 +68,18 @@ export class PlayAreaComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.pageVisSvc.$onPageVisibilityChange.subscribe(( visibilityState: AngularPageVisibilityStateEnum ) => {
-        if ( visibilityState === AngularPageVisibilityStateEnum.VISIBLE ) {
-          console.log( 'OnInit => visibilityChange => visible' );
-        } else if (visibilityState === AngularPageVisibilityStateEnum.HIDDEN) {
-          console.log( 'OnInit => visibilityChange => hidden' );
-        } else if (visibilityState === AngularPageVisibilityStateEnum.PRERENDER) {
-          console.log( 'OnInit => visibilityChange => prerender' );
-        } else if (visibilityState === AngularPageVisibilityStateEnum.UNLOADED) {
-          console.log( 'OnInit => visibilityChange => unloaded' );
-        }
-      } );
-    //     moveSvc.init();
+    // this.pageVisSvc.$onPageVisibilityChange.subscribe(( visibilityState: AngularPageVisibilityStateEnum ) => {
+    //     if ( visibilityState === AngularPageVisibilityStateEnum.VISIBLE ) {
+    //       console.log( 'OnInit => visibilityChange => visible' );
+    //     } else if (visibilityState === AngularPageVisibilityStateEnum.HIDDEN) {
+    //       console.log( 'OnInit => visibilityChange => hidden' );
+    //     } else if (visibilityState === AngularPageVisibilityStateEnum.PRERENDER) {
+    //       console.log( 'OnInit => visibilityChange => prerender' );
+    //     } else if (visibilityState === AngularPageVisibilityStateEnum.UNLOADED) {
+    //       console.log( 'OnInit => visibilityChange => unloaded' );
+    //     }
+    //   } );
+
     this.route.params.subscribe(async (val) => {
         const gameUuid = val.gameUuid;
         this.activeGameUuid = gameUuid;
@@ -127,9 +127,8 @@ export class PlayAreaComponent implements OnInit {
     });
     console.log(`***** initialise play-area [${this.activeGameUuid}]`);
 
-    this.$onMoves=this.moveSvc.$onMoves
-    this.$onMoves.subscribe((ms)=>{
-        console.log(`moveSvc subscription [${ms.gameUuid}] [${ms.moves.length}] `);
+    this.moveSvc.$onMoves.subscribe((ms)=>{
+        // console.log(`moveSvc subscription [${ms.gameUuid}] [${ms.moves.length}] `);
         if(ms.gameUuid==this.activeGameUuid){
             this.performMoves(ms.gameUuid,ms.moves);
         }
