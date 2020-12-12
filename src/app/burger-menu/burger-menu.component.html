@@ -2,6 +2,7 @@
 	<mat-menu #appMenu="matMenu" xPosition="before" >
 	  <button mat-menu-item (click)="onSettings()">Settings</button>
 	  <button mat-menu-item (click)="onHelp()">Help</button>
+	  <button mat-menu-item (click)="onSignOut()">Sign Out</button>
 	</mat-menu>
 
 	<button mat-icon-button [matMenuTriggerFor]="appMenu">

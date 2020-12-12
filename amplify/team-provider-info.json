@@ -1,0 +1,27 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-spitenmalicev10-dev-81504-authRole",
+      "UnauthRoleArn": "arn:aws:iam::841044393207:role/amplify-spitenmalicev10-dev-81504-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::841044393207:role/amplify-spitenmalicev10-dev-81504-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-spitenmalicev10-dev-81504-deployment",
+      "UnauthRoleName": "amplify-spitenmalicev10-dev-81504-unauthRole",
+      "StackName": "amplify-spitenmalicev10-dev-81504",
+      "StackId": "arn:aws:cloudformation:eu-west-2:841044393207:stack/amplify-spitenmalicev10-dev-81504/841bbe60-06da-11eb-b6ca-0a5e9edf4660",
+      "AmplifyAppId": "d3q8l0tnz0sv6y"
+    },
+    "categories": {
+      "function": {
+        "spitenmalicev10d480e939CustomMessage": {
+          "REDIRECTURL": "http://localhost:4203/welcome",
+          "EMAILSUBJECT": "Spite-n-Malice Account verification",
+          "EMAILMESSAGE": "Please follow the below link to verify your email address and create a Spite-n-Malice account"
+        }
+      },
+      "auth": {
+        "spitenmalicev10d480e939": {}
+      }
+    }
+  }
+}

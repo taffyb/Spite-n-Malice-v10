@@ -5,6 +5,6 @@
 			[routerLink]="link.target">
 			{{link.label}}<span *ngIf="link.allowClose" class="close" (click)="close(link.target)">x</span></a>
 	</ng-container>
+	<app-burger-menu *ngIf="authState===authStates.SignedIn"></app-burger-menu>
 </nav>
-<app-burger-menu></app-burger-menu>
 <router-outlet></router-outlet>

@@ -8,7 +8,7 @@ import {IPlayerModel, IGameModel, IProfileModel} from 's-n-m-lib';
 import {PlayerService} from '../services/player.service';
 import {ProfileService} from '../services/profile.service';
 import {GameService} from '../services/game.service';
-import {AuthService} from '../services/auth.service';
+// import {AuthService} from '../services/auth.service';
 import {AuthTypesEnum} from '../classes/auth.enums';
 
 @Component({
@@ -24,7 +24,7 @@ export class SplashComponent implements OnInit {
     private playerSvc:PlayerService,
     private profileSvc:ProfileService,
     private gameSvc:GameService,
-    private authSvc:AuthService,
+    // private authSvc:AuthService,
     public dialog: MatDialog) 
   { }
 
@@ -46,7 +46,7 @@ export class SplashComponent implements OnInit {
         if(result.data.option == DialogOptions.OK && name.length>0){
             console.log(`login Dialog name:${name}`);
             this.playerSvc.getPlayerByName$(name).subscribe((player)=>{
-              this.authSvc.setAuthType(AuthTypesEnum.AUTHENTICATED);
+              // this.authSvc.setAuthType(AuthTypesEnum.AUTHENTICATED);
               this.router.navigate([`/home`]);
             });
         }
@@ -61,10 +61,15 @@ export class SplashComponent implements OnInit {
       this.openDialog(msg,options);        
   }
   async guestEntry(){
-    this.authSvc.setAuthType(AuthTypesEnum.GUEST);
+    // this.authSvc.setAuthType(AuthTypesEnum.GUEST);
     const player = await this.playerSvc.getPlayerByName$("Player1").toPromise();
     const profile$:Observable<IProfileModel> = this.profileSvc.getDefaultProfile$();
     const game:IGameModel = this.gameSvc.newGame("game",player.uuid,"222222",true); 
     this.router.navigate([`/play-area/${game.uuid}`]);
+  }
+
+  
+  testLogin(){
+    // this.authSvc.signIn('taffy','password');
   }
 }

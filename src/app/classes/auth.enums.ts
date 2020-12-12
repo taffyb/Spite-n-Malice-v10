@@ -1,5 +1,8 @@
-export enum AuthTypesEnum{
+import { AuthState } from '@aws-amplify/ui-components';
+
+export enum MyAuthTypesEnum{
     UNAUTHENTICATED,
-    GUEST,
-    AUTHENTICATED
+    GUEST
 }
+
+export type AuthTypesEnum = AuthState | MyAuthTypesEnum;

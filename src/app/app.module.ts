@@ -28,6 +28,17 @@ import { OpponentComponent } from './opponent/opponent.component';
 
 import { AngularPageVisibilityModule } from 'angular-page-visibility';
 import { GameExplorerComponent } from './game-explorer/game-explorer.component';
+import { LoginComponent } from './login/login.component';
+
+
+import {AmplifyAngularModule, AmplifyService} from 'aws-amplify-angular';
+/* Add Amplify imports */
+import { AmplifyUIAngularModule } from '@aws-amplify/ui-angular';
+import Amplify from 'aws-amplify';
+import awsconfig from '../aws-exports';
+
+/* Configure Amplify resources */
+Amplify.configure(awsconfig);
 
 @NgModule({
   declarations: [
@@ -49,7 +60,9 @@ import { GameExplorerComponent } from './game-explorer/game-explorer.component';
     OpponentComponent,
     GameItemComponent,
     InvitationComponent,
-    GameExplorerComponent
+    GameExplorerComponent,
+    LoginComponent
+    
   ],
   imports: [
     BrowserModule,
@@ -58,9 +71,10 @@ import { GameExplorerComponent } from './game-explorer/game-explorer.component';
     HttpClientModule,
     MaterialModules,
     FormsModule,
-    AngularPageVisibilityModule
+    AngularPageVisibilityModule,    
+    AmplifyUIAngularModule
   ],
-  providers: [],
+  providers: [AmplifyService],
   bootstrap: [AppComponent],
   entryComponents:[HelpDialogComponent,ProfileDialogComponent, ModalDialog]
 })

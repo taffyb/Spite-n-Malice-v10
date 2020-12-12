@@ -12,12 +12,12 @@ import {IPlayerModel,Opponent} from 's-n-m-lib';
   providedIn: 'root'
 })
 export class PlayerService {
-  private _players:IPlayerModel[]= [{uuid:'123456',name:'Taffy'},
+  private _players:IPlayerModel[]= [{uuid:'taffy',name:'taffy'},
                                     {uuid:'987654',name:'Suzannah'},
                                     {uuid:'111111',name:'Player1'},
                                     {uuid:'222222',name:'Player2'}];
   private _playersByGuid={          
-                          '123456':{uuid:'123456',name:'Taffy'},
+                          'taffy':{uuid:'taffy',name:'taffy'},
                           '987654':{uuid:'987654',name:'Suzannah'},
                           '111111':{uuid:'111111',name:'Player1'},
                           '222222':{uuid:'222222',name:'Player2'}

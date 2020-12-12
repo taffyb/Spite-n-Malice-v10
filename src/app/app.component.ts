@@ -1,16 +1,16 @@
-import {Component,OnInit } from '@angular/core';
-import {Observable, of} from 'rxjs';
-import {AuthService} from './services/auth.service';
-import {AuthTypesEnum} from './classes/auth.enums';
+import {Component,OnInit,ChangeDetectorRef } from '@angular/core';
+import {Observable} from 'rxjs';
+// import {AuthService} from './services/auth.service';
+// import {AuthTypesEnum} from './classes/auth.enums';
+import { onAuthUIStateChange, CognitoUserInterface, AuthState } from '@aws-amplify/ui-components';
 import {ProfileService} from './services/profile.service';
-import {PlayerService} from './services/player.service';
 import {GameService} from './services/game.service';
-import {Game, IGameModel} from './classes/games';
-import {IProfileModel, IPlayerModel, GameStatesEnum} from 's-n-m-lib';
+import {PlayerService} from './services/player.service';
+import {IProfileModel, GameStatesEnum} from 's-n-m-lib';
 import { MatDialog } from '@angular/material/dialog';
-import {ModalDialog, DialogOptions } from './modal-dialog/modal-dialog';
+import {User} from './classes/user.model';
 
-import {ActivatedRoute, Router, NavigationStart } from '@angular/router';
+import {Router, NavigationStart } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -21,28 +21,20 @@ export class AppComponent implements OnInit {
     title:string="Spite-Malice-v10";
     links: any[] =[];
     profile$:Observable<IProfileModel>;
-    authTypes = AuthTypesEnum;
-    authStatus: AuthTypesEnum = AuthTypesEnum.UNAUTHENTICATED;
+    user: CognitoUserInterface | undefined;
+    authState: AuthState;
     selectedTab:number=0;
+    authStates=AuthState;
 
     constructor(
             private router: Router,
-            private playerSvc:PlayerService,
             private profileSvc:ProfileService,
             private gameSvc:GameService,
-            public dialog: MatDialog,
-            private authSvc: AuthService){
-        authSvc.authStatusChanged.subscribe((status) => {
-            this.authStatus = status;
-            console.log(`Auth Status: ${AuthTypesEnum[this.authStatus]}`);
-        });
-        gameSvc.statusChanged.subscribe((change) => {
-            const label: string = change.game.name;
-            switch(change.status){
-                case GameStatesEnum.NEW:
-                    this.links.push({label: label,target:`play-area/${change.game.uuid}`,visible:true,allowClose:true});
-            }
-        });
+            private playerSvc:PlayerService,
+            private ref: ChangeDetectorRef,
+            public dialog: MatDialog
+            ){
+
         router.events.subscribe((event)=>{
             if(event instanceof NavigationStart){
                 let eventUrl = event.url;
@@ -60,6 +52,24 @@ export class AppComponent implements OnInit {
     ngOnInit(){
        this.links.push({label: 'Welcome',target:'welcome'});
        this.links.push({label: 'Home',target:'home'});
+       
+       this.gameSvc.statusChanged.subscribe((change) => {
+            const label: string = change.game.name;
+            switch(change.status){
+                case GameStatesEnum.NEW:
+                    this.links.push({label: label,target:`play-area/${change.game.uuid}`,visible:true,allowClose:true});
+            }
+        });
+       onAuthUIStateChange((authState, authData) => {
+        this.authState = authState;
+        this.user = authData as CognitoUserInterface;
+        this.ref.detectChanges();
+        if(this.authState==AuthState.SignedIn){
+            this.playerSvc.setActivePlayer(this.user.username);
+
+        }
+        console.log(`active player: ${this.playerSvc.getActivePlayer()}`);
+      })
     }
 
     close(linkTarget:string){
@@ -88,18 +98,16 @@ export class AppComponent implements OnInit {
         const target:string = targetUrl.split('/')[0];
         switch(target){
             case 'welcome':
-                visible=true;
+                visible=(this.authState!=AuthState.SignedIn);
                 break;
             case 'home':
-                visible=this.authStatus===AuthTypesEnum.AUTHENTICATED;
+                visible=(this.authState===AuthState.SignedIn);
                 break;
             case 'play-area':
-                visible=this.authStatus!=AuthTypesEnum.UNAUTHENTICATED;
-                break;
-            case 'settings':
-                visible=this.authStatus===AuthTypesEnum.AUTHENTICATED;
+                visible=this.authState!=AuthState.SignedOut;
                 break;
         }
         return visible;
     }
+
 }

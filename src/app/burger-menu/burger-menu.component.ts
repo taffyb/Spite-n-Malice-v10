@@ -4,6 +4,8 @@ import { HelpDialogComponent } from '../help-dialog/help-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import {IProfileModel, DEFAULT_PROFILE, IPlayerModel} from 's-n-m-lib';
 import {ProfileService} from '../services/profile.service';
+import { Auth } from 'aws-amplify';
+
 
 @Component({
   selector: 'app-burger-menu',
@@ -14,7 +16,8 @@ export class BurgerMenuComponent implements OnInit {
   @Input()player:IPlayerModel;
   @Input()profile= DEFAULT_PROFILE;
     
-  constructor(public dialog: MatDialog,private profileSvc:ProfileService) { }
+  constructor(public dialog: MatDialog,
+              private profileSvc:ProfileService) { }
 
   ngOnInit() {
   }
@@ -44,5 +47,15 @@ export class BurgerMenuComponent implements OnInit {
           backdropClass:'custom-dialog-backdrop-class',
           panelClass:'custom-dialog-panel-class'
         });
+  }
+  // async function signOut() {
+  //   try {
+  //       await Auth.signOut();
+  //   } catch (error) {
+  //       console.log('error signing out: ', error);
+  //   }
+  // }
+  onSignOut(){
+    Auth.signOut().catch(()=>console.error(`sign out error`));
   }
 }
