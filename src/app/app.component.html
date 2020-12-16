@@ -2,9 +2,11 @@
 	<ng-container *ngFor="let link of links; let i=index">
 		<a mat-tab-link *ngIf="isVisible(link.target)"
 			[ngClass]="{'selected':selectedTab===i}"
-			[routerLink]="link.target">
+			[routerLink]="link.target"
+			(click)="onSelectTab(link.target)">
 			{{link.label}}<span *ngIf="link.allowClose" class="close" (click)="close(link.target)">x</span></a>
 	</ng-container>
-	<app-burger-menu *ngIf="authState===authStates.SignedIn"></app-burger-menu>
+	<app-burger-menu *ngIf="selectedTabName !='' && selectedTabName !='welcome'"></app-burger-menu>
 </nav>
+<br>{{selectedTabName}}
 <router-outlet></router-outlet>

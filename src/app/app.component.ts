@@ -3,6 +3,7 @@ import {Observable} from 'rxjs';
 // import {AuthService} from './services/auth.service';
 // import {AuthTypesEnum} from './classes/auth.enums';
 import { onAuthUIStateChange, CognitoUserInterface, AuthState } from '@aws-amplify/ui-components';
+import { MyAuthService } from './services/auth.service';
 import {ProfileService} from './services/profile.service';
 import {GameService} from './services/game.service';
 import {PlayerService} from './services/player.service';
@@ -11,6 +12,8 @@ import { MatDialog } from '@angular/material/dialog';
 import {User} from './classes/user.model';
 
 import {Router, NavigationStart } from '@angular/router';
+import { MyAuthTypesEnum } from './classes/auth.enums';
+import { AuthGuardService } from './services/auth-guard.service';
 
 @Component({
   selector: 'app-root',
@@ -24,13 +27,16 @@ export class AppComponent implements OnInit {
     user: CognitoUserInterface | undefined;
     authState: AuthState;
     selectedTab:number=0;
-    authStates=AuthState;
+    selectedTabName:string="welcome";
+    authStates=MyAuthTypesEnum;
 
     constructor(
             private router: Router,
             private profileSvc:ProfileService,
             private gameSvc:GameService,
             private playerSvc:PlayerService,
+            private myAuthSvc:MyAuthService,
+            private authGuardSvc:AuthGuardService,
             private ref: ChangeDetectorRef,
             public dialog: MatDialog
             ){
@@ -39,9 +45,11 @@ export class AppComponent implements OnInit {
             if(event instanceof NavigationStart){
                 let eventUrl = event.url;
                 eventUrl=eventUrl.substr(1,eventUrl.length-1);
+                
                 this.links.forEach((l,i)=>{
                     if(l.target==eventUrl){
                         this.selectedTab=i;
+                        this.selectedTabName=l.target;
                     }
                 });
             }
@@ -49,10 +57,13 @@ export class AppComponent implements OnInit {
         });
         console.log(`AppComponent: Constructor`);
     }
+    onSelectTab(tabName){
+        this.selectedTabName=tabName;
+    }
     ngOnInit(){
        this.links.push({label: 'Welcome',target:'welcome'});
        this.links.push({label: 'Home',target:'home'});
-       
+
        this.gameSvc.statusChanged.subscribe((change) => {
             const label: string = change.game.name;
             switch(change.status){
@@ -66,9 +77,10 @@ export class AppComponent implements OnInit {
         this.ref.detectChanges();
         if(this.authState==AuthState.SignedIn){
             this.playerSvc.setActivePlayer(this.user.username);
+            this.myAuthSvc.setAuthStatus(MyAuthTypesEnum.AUTHENTICATED);
+            this.router.navigate(['/home']);
 
         }
-        console.log(`active player: ${this.playerSvc.getActivePlayer()}`);
       })
     }
 
@@ -94,20 +106,8 @@ export class AppComponent implements OnInit {
         }
     }
     isVisible(targetUrl:string):boolean{
-        let visible=false;
-        const target:string = targetUrl.split('/')[0];
-        switch(target){
-            case 'welcome':
-                visible=(this.authState!=AuthState.SignedIn);
-                break;
-            case 'home':
-                visible=(this.authState===AuthState.SignedIn);
-                break;
-            case 'play-area':
-                visible=this.authState!=AuthState.SignedOut;
-                break;
-        }
-        return visible;
+        let isVisible:boolean = this.authGuardSvc.isVisible(targetUrl);
+        return isVisible;
     }
 
 }

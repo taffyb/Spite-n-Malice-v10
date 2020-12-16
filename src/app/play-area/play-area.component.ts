@@ -87,10 +87,12 @@ export class PlayAreaComponent implements OnInit {
         if(gameUuid){
             try{
                 this.game = await this.gameSvc.getGame$(gameUuid).toPromise(); 
+                console.log(`player1Uuid:${this.game.player1Uuid}, player2Uuid:${this.game.player2Uuid}`);
                 this.players$=this.playerSvc.getPlayers$([this.game.player1Uuid,this.game.player2Uuid]).pipe(
                     tap((players)=>{
                         this.players=players;
-                    }));
+                    })
+                );
                 this.profile = this.profileSvc.getActiveProfile(); 
                 this.game.onStateChange$().subscribe({
                     next:async (gameState)=>{
@@ -460,7 +462,7 @@ export class PlayAreaComponent implements OnInit {
       return {top:clientRect.top,left:clientRect.left};
   }
   playAgain(){
-      const g:Game = this.gameSvc.newGame("new", this.game.player1Uuid, this.game.player2Uuid,this.game.local);
+      const g:Game = this.gameSvc.newGame("game", this.game.player1Uuid, this.game.player2Uuid,this.game.local);
       this.message="";
       this.game = g;
       const url:string = `/play-area/${g.uuid}`;

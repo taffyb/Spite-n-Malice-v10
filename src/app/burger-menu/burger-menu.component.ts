@@ -4,7 +4,9 @@ import { HelpDialogComponent } from '../help-dialog/help-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import {IProfileModel, DEFAULT_PROFILE, IPlayerModel} from 's-n-m-lib';
 import {ProfileService} from '../services/profile.service';
+import {PlayerService} from '../services/player.service';
 import { Auth } from 'aws-amplify';
+import {Router, NavigationStart } from '@angular/router';
 
 
 @Component({
@@ -16,8 +18,11 @@ export class BurgerMenuComponent implements OnInit {
   @Input()player:IPlayerModel;
   @Input()profile= DEFAULT_PROFILE;
     
-  constructor(public dialog: MatDialog,
-              private profileSvc:ProfileService) { }
+  constructor(
+    private router: Router,
+    public dialog: MatDialog,
+    private profileSvc:ProfileService,
+    private playerSvc:PlayerService) { }
 
   ngOnInit() {
   }
@@ -56,6 +61,13 @@ export class BurgerMenuComponent implements OnInit {
   //   }
   // }
   onSignOut(){
-    Auth.signOut().catch(()=>console.error(`sign out error`));
+    this.playerSvc.signOut();
+    Auth.signOut()
+    .then(()=>{
+      
+      this.router.navigate(['/welcome']);
+    })
+    .catch(()=>console.error(`sign out error`));
+    
   }
 }

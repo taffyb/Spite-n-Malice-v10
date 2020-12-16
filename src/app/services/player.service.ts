@@ -22,7 +22,7 @@ export class PlayerService {
                           '111111':{uuid:'111111',name:'Player1'},
                           '222222':{uuid:'222222',name:'Player2'}
                          };
-  private _activePlayer:IPlayerModel;
+  private _activePlayer:IPlayerModel = null;
   private _opponents:Opponent[];
   private _opponents$:Observable<Opponent[]>;
   private _opponentObserver:any;
@@ -96,6 +96,9 @@ export class PlayerService {
           player$=of(this._activePlayer);
       }
     return player$;
+  }
+  signOut(){
+      this._activePlayer=null;
   }
   setActivePlayer(playerGuid){
       console.log(`setActivePlayer(${playerGuid})`);

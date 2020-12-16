@@ -8,8 +8,9 @@ import {IPlayerModel, IGameModel, IProfileModel} from 's-n-m-lib';
 import {PlayerService} from '../services/player.service';
 import {ProfileService} from '../services/profile.service';
 import {GameService} from '../services/game.service';
-// import {AuthService} from '../services/auth.service';
-import {AuthTypesEnum} from '../classes/auth.enums';
+import {MyAuthService} from '../services/auth.service';
+import {MyAuthTypesEnum} from '../classes/auth.enums';
+import { Auth } from 'aws-amplify';
 
 @Component({
   selector: 'app-splash',
@@ -22,54 +23,56 @@ export class SplashComponent implements OnInit {
   constructor(
     private router: Router,
     private playerSvc:PlayerService,
+    private myAuthSvc:MyAuthService,
     private profileSvc:ProfileService,
     private gameSvc:GameService,
-    // private authSvc:AuthService,
     public dialog: MatDialog) 
   { }
 
   ngOnInit() {
   }
   
-  openDialog(message:string,options:number): void {
-      const dialogRef = this.dialog.open(ModalDialog, {
-        width: '300px',
-        backdropClass:'custom-dialog-backdrop-class',
-        panelClass:'custom-dialog-panel-class',
-        data: {message: message,
-               dialogOptions:options
-              }
-      });
+  // openDialog(message:string,options:number): void {
+  //     const dialogRef = this.dialog.open(ModalDialog, {
+  //       width: '300px',
+  //       backdropClass:'custom-dialog-backdrop-class',
+  //       panelClass:'custom-dialog-panel-class',
+  //       data: {message: message,
+  //              dialogOptions:options
+  //             }
+  //     });
    
-      dialogRef.afterClosed().subscribe(async (result) => {
-        let name = result.data.input;
-        if(result.data.option == DialogOptions.OK && name.length>0){
-            console.log(`login Dialog name:${name}`);
-            this.playerSvc.getPlayerByName$(name).subscribe((player)=>{
-              // this.authSvc.setAuthType(AuthTypesEnum.AUTHENTICATED);
-              this.router.navigate([`/home`]);
-            });
-        }
-      });
-  }
+  //     dialogRef.afterClosed().subscribe(async (result) => {
+  //       let name = result.data.input;
+  //       if(result.data.option == DialogOptions.OK && name.length>0){
+  //           console.log(`login Dialog name:${name}`);
+  //           this.playerSvc.getPlayerByName$(name).subscribe((player)=>{
+  //             this.router.navigate([`/home`]);
+  //           });
+  //       }
+  //     });
+  // }
   login(){
-      let msg:string = "Please Enter Username";
-      let options:number = DialogOptions.OK+
-                           DialogOptions.CANCEL+
-                           DialogOptions.MANDATORY+
-                           DialogOptions.INPUT;
-      this.openDialog(msg,options);        
+
+    Auth.currentAuthenticatedUser()
+    .then(user =>{ 
+        this.myAuthSvc.setAuthStatus(MyAuthTypesEnum.AUTHENTICATED);
+        this.playerSvc.setActivePlayer(user.username);
+        this.router.navigate([`/home`]);
+    })
+    .catch(err => {
+      console.log(err);
+      this.myAuthSvc.setAuthStatus(MyAuthTypesEnum.UNAUTHENTICATED);
+      this.router.navigate([`/login`]);
+    });
+              
   }
   async guestEntry(){
-    // this.authSvc.setAuthType(AuthTypesEnum.GUEST);
+    this.myAuthSvc.setAuthStatus(MyAuthTypesEnum.GUEST);
     const player = await this.playerSvc.getPlayerByName$("Player1").toPromise();
     const profile$:Observable<IProfileModel> = this.profileSvc.getDefaultProfile$();
     const game:IGameModel = this.gameSvc.newGame("game",player.uuid,"222222",true); 
     this.router.navigate([`/play-area/${game.uuid}`]);
   }
 
-  
-  testLogin(){
-    // this.authSvc.signIn('taffy','password');
-  }
 }

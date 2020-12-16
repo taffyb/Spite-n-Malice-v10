@@ -5,6 +5,7 @@ import {GameService} from '../services/game.service';
 import {WsService} from '../services/ws.service';
 import {IGameModel} from '../classes/games';
 import {IPlayerModel, IInvitationMessage} from 's-n-m-lib';
+import { Auth } from 'aws-amplify';
 
 @Component({
   selector: 'app-home',
@@ -13,7 +14,7 @@ import {IPlayerModel, IInvitationMessage} from 's-n-m-lib';
 })
 export class HomeComponent implements OnInit {
   player:IPlayerModel;
-  game:IGameModel;
+//   game:IGameModel;
   games$;
   opponents$;
   invitations:IInvitationMessage[]=[];
@@ -25,16 +26,20 @@ export class HomeComponent implements OnInit {
           private playerSvc:PlayerService,
           private wsSvc:WsService) {
       console.log(`HomeComponent: Constructor`);
-      this.player = playerSvc.getActivePlayer();
-      console.log(`Player: ${JSON.stringify(this.player)}`);
-      this.games$= gameSvc.getGames$(this.player.uuid,3);
-      this.opponents$=playerSvc.getOpponents$(this.player.uuid);
-      wsSvc.connect();
-      wsSvc.login(this.player);
-  }
-
-  ngOnInit() {
-      console.log(`HomeComponent: ngOnInit`);
+      
+    Auth.currentAuthenticatedUser()
+    .then(user =>{ 
+        console.log(`currentAuthenticatedUser:${user.username}`);
+        this.playerSvc.setActivePlayer(user.username);
+        this.player = this.playerSvc.getActivePlayer();
+        console.log(`Player: ${JSON.stringify(this.player)}`);
+        this.games$= this.gameSvc.getGames$(this.player.uuid,3);
+        this.opponents$=this.playerSvc.getOpponents$(this.player.uuid);
+        // wsSvc.connect();
+        // wsSvc.login(this.player);
+    })
+    .catch(err => console.log(err)
+    );
       this.wsSvc.onInvitation$().subscribe({
           next:(invite)=>{this.invitations.push(invite);},
           error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
@@ -56,10 +61,19 @@ export class HomeComponent implements OnInit {
           error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
       });
   }
+
+  ngOnInit() {
+      
+    console.log(`HomeComponent: Init`);
+  }
   
   newGame(){
-      const game:IGameModel = this.gameSvc.newGame("new",this.player.uuid,"222222",true); 
-      this.router.navigate([`/play-area/${game.uuid}`]);
+
+    const g:IGameModel = this.gameSvc.newGame("game", this.playerSvc.getActivePlayer().uuid, "Player2",true);
+    // this.game = g;
+    const url:string = `/play-area/${g.uuid}`;
+    console.log(`route to new game: ${url}`);
+    this.router.navigate([url]);
   }
   sendInvite(opponent:IPlayerModel){
       console.log(`Asking ${opponent.name} to play a game`);
