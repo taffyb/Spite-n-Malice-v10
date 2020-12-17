@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import {ActivatedRoute, Router } from '@angular/router';
 import {PlayerService} from '../services/player.service';
+import {ProfileService} from '../services/profile.service';
 import {GameService} from '../services/game.service';
 import {WsService} from '../services/ws.service';
 import {IGameModel} from '../classes/games';
@@ -24,6 +25,7 @@ export class HomeComponent implements OnInit {
           private route: ActivatedRoute,
           private gameSvc:GameService,
           private playerSvc:PlayerService,
+          private profileSvc:ProfileService,
           private wsSvc:WsService) {
       console.log(`HomeComponent: Constructor`);
       
@@ -32,6 +34,10 @@ export class HomeComponent implements OnInit {
         console.log(`currentAuthenticatedUser:${user.username}`);
         this.playerSvc.setActivePlayer(user.username);
         this.player = this.playerSvc.getActivePlayer();
+        this.profileSvc.getProfile$(this.player.uuid).subscribe({
+          next:(profile)=>{console.log(`getProfile: ${JSON.stringify(profile)}`)},
+          error:(err)=>{console.log(`getProfile error: ${JSON.stringify(err)}`)}
+        });
         console.log(`Player: ${JSON.stringify(this.player)}`);
         this.games$= this.gameSvc.getGames$(this.player.uuid,3);
         this.opponents$=this.playerSvc.getOpponents$(this.player.uuid);

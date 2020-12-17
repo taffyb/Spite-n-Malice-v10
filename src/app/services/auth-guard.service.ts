@@ -19,7 +19,7 @@ export class AuthGuardService implements CanActivate {
   isVisible(target:string):boolean{
       const authStatus:MyAuthTypesEnum = this.myAuthSvc.getAuthStatus();
       let visible=false;
-
+      target=target.split('/')[0];
       switch(target){
         case 'login':
           visible=true;
@@ -37,7 +37,7 @@ export class AuthGuardService implements CanActivate {
             visible=(authStatus!=MyAuthTypesEnum.UNAUTHENTICATED);
               break;
       }
-      // console.log(`auth-guard.isVisible target:${target} visible:${visible}`);
+      // console.log(`${MyAuthTypesEnum[authStatus]} auth-guard.isVisible target:${target} visible:${visible}`);
       return visible;
   }
 }

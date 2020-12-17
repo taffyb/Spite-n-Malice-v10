@@ -6,7 +6,7 @@ import {MyAuthTypesEnum} from '../classes/auth.enums';
   providedIn: 'root'
 })
 export class MyAuthService {
-    private _authStatus: MyAuthTypesEnum;
+    private _authStatus: MyAuthTypesEnum = MyAuthTypesEnum.UNAUTHENTICATED;
 
     constructor(){
     }

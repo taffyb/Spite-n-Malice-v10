@@ -111,4 +111,7 @@ export class GameService{
                     console.error("Error Updating Game State", response);
                 });
     }
+    setGame(gameUuid:string,cards:ICardModel[][]){
+        this._games[gameUuid].cards=cards;
+    }
 }

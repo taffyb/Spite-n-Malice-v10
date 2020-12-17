@@ -7,6 +7,7 @@ import * as common from './service.common';
 import {WsService} from './ws.service';
 import {ProfileService} from './profile.service';
 import {IPlayerModel,Opponent} from 's-n-m-lib';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -54,8 +55,9 @@ export class PlayerService {
       return this._activePlayer;
   }
   getOpponents$(uuid):Observable<Opponent[]>{
+    const url = `${environment.apiGateway}/players/${uuid}/profile`;
       return new Observable<Opponent[]>((observer)=>{
-          this.http.get<Opponent[]>(`${common.endpoint}players/${uuid}/opponents`).pipe(
+          this.http.get<Opponent[]>(`${url}`).pipe(
               tap((opponents)=>{
                   this._opponents=opponents;
                   this._opponentObserver=observer;

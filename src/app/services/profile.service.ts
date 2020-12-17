@@ -6,6 +6,7 @@ import { map, catchError, tap } from 'rxjs/operators';
 import * as common from './service.common';
 import {IProfileModel,DEFAULT_PROFILE,IPlayerModel} from 's-n-m-lib';
 import {Location, TimeZone} from '../classes/timezones'
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -17,17 +18,14 @@ export class ProfileService {
   constructor(private http:HttpClient) { }
   
   getActiveProfile():IProfileModel{
+    console.log(`getActiveProfile:`);
       return this._profile;
   }
   getProfile$(playerGuid:string):Observable<IProfileModel>{
-    let o:Observable<IProfileModel>;
-    this.playerGuid=playerGuid;
-    if(!this._profile){
-        this._profile = DEFAULT_PROFILE;
-        this._profile.showStatistics=false;
-    }
-    o= of(this._profile);
-    return o;
+      
+    const url = `${environment.apiGateway}/players/${playerGuid}/profile`;
+    console.log(`get profile: ${url}`);
+    return this.http.get<IProfileModel>(url).pipe(tap(profile=>{this._profile=profile;}));
   }
   saveProfile(playerGuid:string,profile:IProfileModel){
       this._profile.showStatistics=profile.showStatistics;
