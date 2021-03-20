@@ -8,7 +8,8 @@ import {MoveService} from '../services/move.service';
   providedIn: 'root'
 })
 export class DealerService extends Dealer{
-
+  private dealer:Dealer = new Dealer();
+  
   constructor(private moveSvc: MoveService) {super();}
   
   fillHand(activePlayer: number, game: Game): IMoveModel[]{

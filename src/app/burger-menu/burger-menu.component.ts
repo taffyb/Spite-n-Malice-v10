@@ -83,7 +83,10 @@ export class BurgerMenuComponent implements OnInit {
   }
   onSetCards(){
     const gameUUID:string = prompt("enter Game UUID");
-    const inArr:number[][] =JSON.parse(prompt("enter cards array"));
+    const cardsStr:string =prompt("enter cards array");
+    console.log(cardsStr);
+    
+    const inArr:number[][] =JSON.parse(cardsStr);
     const cards:ICardModel[][]=[];
 
     for(let pos:number=PositionsEnum.PLAYER_PILE;pos<=PositionsEnum.RECYCLE;pos++){
