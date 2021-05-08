@@ -1,12 +1,12 @@
 
 <mat-tab-group>
 	<mat-tab label="Animation">
-	    <div class="tab-content">
-	    <mat-checkbox [checked]="_profile.animation.animateYN" 
+	    <div class="tab-content" *ngIf="profile; else loading">
+	    <mat-checkbox [checked]="profile.animation.animateYN" 
 	    			  (change)="profile.animation.animateYN = $event.checked">Animate Cards</mat-checkbox><br>
 	    <div class="indent">
 		    <mat-checkbox [disabled]="profile.animation.animateYN?'false':'true'"
-			    [checked]="_profile.animation.animate.recycleYN" 
+			    [checked]="profile.animation.animate.recycleYN" 
 			    (change)="profile.animation.animate.recycleYN = $event.checked">Recycle</mat-checkbox>&nbsp;
 			    <mat-slider	    	
 			        [disabled]="disableSlider('recycle')"
@@ -18,7 +18,7 @@
 			        [(ngModel)]="profile.animation.animate.recycle">
 			    </mat-slider><br>
 		    <mat-checkbox [disabled]="profile.animation.animateYN?'false':'true'" 
-			    [checked]="_profile.animation.animate.dealerYN" 
+			    [checked]="profile.animation.animate.dealerYN" 
 			    (change)="profile.animation.animate.dealerYN = $event.checked">Dealer</mat-checkbox>&nbsp;
 			    <mat-slider
 			        [disabled]="disableSlider('dealer')"  
@@ -30,7 +30,7 @@
 			        [(ngModel)]="profile.animation.animate.dealer">
 			    </mat-slider><br>
 		    <mat-checkbox [disabled]="profile.animation.animateYN?'false':'true'" 
-			    [checked]="_profile.animation.animate.playerYN" 
+			    [checked]="profile.animation.animate.playerYN" 
 			    (change)="profile.animation.animate.playerYN = $event.checked">Player</mat-checkbox>&nbsp;
 			    <mat-slider
 			        [disabled]="disableSlider('player')"  
@@ -42,7 +42,7 @@
 			        [(ngModel)]="profile.animation.animate.player">
 			    </mat-slider><br>
 		    <mat-checkbox [disabled]="profile.animation.animateYN?'false':'true'" 
-			    [checked]="_profile.animation.animate.opponentYN" 
+			    [checked]="profile.animation.animate.opponentYN" 
 			    (change)="profile.animation.animate.opponentYN = $event.checked">Opponent</mat-checkbox>&nbsp;
 			    <mat-slider
 			        [disabled]="disableSlider('opponent')"  
@@ -55,10 +55,11 @@
 			    </mat-slider>
 			</div>
 	    </div>
+		<ng-template #loading>Loading ...</ng-template>
 	</mat-tab>
   	<mat-tab label="Statistics">
 		<div class="tab-content">
-        	<mat-checkbox [checked]="_profile.showStatistics" (change)="profile.showStatistics = $event.checked">Show Statistics</mat-checkbox>
+        	<mat-checkbox [checked]="profile.showStatistics" (change)="profile.showStatistics = $event.checked">Show Statistics</mat-checkbox>
         </div>
     </mat-tab>
 </mat-tab-group>

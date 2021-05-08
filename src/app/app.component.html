@@ -6,6 +6,6 @@
 			(click)="onSelectTab(link.target)">
 			{{link.label}}<span *ngIf="link.allowClose" class="close" (click)="close(link.target)">x</span></a>
 	</ng-container>
-	<app-burger-menu *ngIf="selectedTabName !='' && selectedTabName !='welcome'"></app-burger-menu>
+	<app-burger-menu *ngIf="selectedTabName !='' && selectedTabName !='welcome'" ></app-burger-menu>
 </nav>
 <router-outlet></router-outlet>

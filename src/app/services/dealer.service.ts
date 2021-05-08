@@ -8,7 +8,7 @@ import {MoveService} from '../services/move.service';
   providedIn: 'root'
 })
 export class DealerService extends Dealer{
-  private dealer:Dealer = new Dealer();
+  // private dealer:Dealer = new Dealer();
   
   constructor(private moveSvc: MoveService) {super();}
   
@@ -17,9 +17,9 @@ export class DealerService extends Dealer{
     let moves:IMoveModel[] = [];
     moves=super.fillHand(activePlayer,game);
 
-    const addMove = new Promise((resolve,reject)=>{
+    // const addMove = new Promise((resolve,reject)=>{
         this.moveSvc.addMoves(game,"", moves);
-    });
+    // });
     return moves;
   }
 }

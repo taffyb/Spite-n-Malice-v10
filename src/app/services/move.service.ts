@@ -23,7 +23,7 @@ export class MoveService{
         console.log(`MoveService.constructor`);
  
     }
-    $onMoves: Subject<{gameUuid: string, moves: IMoveModel[]}> = new Subject<{gameUuid: string, moves: IMoveModel[]}>();
+    moves$: Subject<{gameUuid: string, moves: IMoveModel[]}> = new Subject<{gameUuid: string, moves: IMoveModel[]}>();
     init(){
         if( this.wsSvc.connected){
             this.wsSvc.onRecieveMoves$().subscribe({
@@ -48,7 +48,7 @@ export class MoveService{
         //         this.subscribers[key]({gameUuid:gameUuid,moves:ms});
         //     }
         // }
-        this.$onMoves.next(movesToPublish);
+        this.moves$.next(movesToPublish);
     }    
     addMove(game: IGameModel, playerUuid: string, m: IMoveModel){
         let moves: IMoveModel[] = [];
@@ -110,6 +110,8 @@ export class MoveService{
             m.type = MoveTypesEnum.RECYCLE;
             moves.push(m);
         }
+        // console.log(`MoveService.moveToRecycle: Add Moves <${moves.length}> to RECYCLE`);
+        
         this.addMoves(game,"",moves);
     }
     getMoves$(gameUuid:string,playerUuid?:string,limit?:number):Observable<IMoveModel[]>{

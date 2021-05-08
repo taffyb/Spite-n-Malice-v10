@@ -32,26 +32,7 @@ export class SplashComponent implements OnInit {
   ngOnInit() {
   }
   
-  // openDialog(message:string,options:number): void {
-  //     const dialogRef = this.dialog.open(ModalDialog, {
-  //       width: '300px',
-  //       backdropClass:'custom-dialog-backdrop-class',
-  //       panelClass:'custom-dialog-panel-class',
-  //       data: {message: message,
-  //              dialogOptions:options
-  //             }
-  //     });
-   
-  //     dialogRef.afterClosed().subscribe(async (result) => {
-  //       let name = result.data.input;
-  //       if(result.data.option == DialogOptions.OK && name.length>0){
-  //           console.log(`login Dialog name:${name}`);
-  //           this.playerSvc.getPlayerByName$(name).subscribe((player)=>{
-  //             this.router.navigate([`/home`]);
-  //           });
-  //       }
-  //     });
-  // }
+
   login(){
 
     Auth.currentAuthenticatedUser()

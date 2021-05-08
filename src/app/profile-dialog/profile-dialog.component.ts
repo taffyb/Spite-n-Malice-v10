@@ -9,17 +9,17 @@ import {IProfileModel,DEFAULT_PROFILE} from 's-n-m-lib';
   styleUrls: ['./profile-dialog.component.css']
 })
 export class ProfileDialogComponent implements OnInit {
-  _profile:IProfileModel=DEFAULT_PROFILE;
-  profile:IProfileModel;
+   profile:IProfileModel=DEFAULT_PROFILE;
+//   profile:IProfileModel;
   
   constructor(
           public dialogRef: MatDialogRef<ProfileDialogComponent>,
           @Optional() @Inject(MAT_DIALOG_DATA) public data: any) { 
       if(data && data.profile){
-          this._profile=data.profile;
-          this.profile=data.profile;
+          this.profile=JSON.parse(JSON.stringify(data.profile));
+        //   this.profile=data.profile;
       }
-      console.log(`onOpen:${JSON.stringify(data.profile)}`);
+      console.log(`onOpen:${JSON.stringify(this.profile)}`);
   }
 
   ngOnInit() {

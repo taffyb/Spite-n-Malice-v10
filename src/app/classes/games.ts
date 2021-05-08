@@ -25,28 +25,28 @@ export class Game extends libGame{
         return g;        
     }
     onStateChange$():Observable<GameStatesEnum>{
-        const o=Observable.create(e => this.stateEmitter = e);
+        const o=new Observable<GameStatesEnum>(e => this.stateEmitter = e);
         return o;
     }
     
-    performMove(move: IMoveModel) {
+    applyMove(move: IMoveModel) {
         console.log(`game.perfromMove[${MoveTypesEnum[move.type]}]:${JSON.stringify(move)}`);
         if(move.type==MoveTypesEnum.PLAYER){
             let stats=this.stats.players[this.activePlayer];
             stats.moves+=1;
         }
         if(move.id>this.lastMoveId){
-            super.performMove(move);
+            super.applyMove(move);
             this.lastMoveId=move.id;
         }
         if(this.cards[PositionsEnum.PLAYER_PILE+(this.activePlayer*10)].length==0){
             this.state= GameStatesEnum.GAME_OVER;
             this.stateEmitter.next(this.state);
         }
-        if(this.cards[PositionsEnum.DECK].length==0){
-            this.state=GameStatesEnum.DRAW;
-            this.stateEmitter.next(this.state);
-        }
+        // if(this.cards[PositionsEnum.DECK].length==0){
+        //     this.state=GameStatesEnum.DRAW;
+        //     this.stateEmitter.next(this.state);
+        // }
     }
 
     switchPlayer(){

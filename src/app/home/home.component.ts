@@ -8,6 +8,7 @@ import {IGameModel} from '../classes/games';
 import {IPlayerModel, IInvitationMessage} from 's-n-m-lib';
 import { Auth } from 'aws-amplify';
 
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -28,49 +29,53 @@ export class HomeComponent implements OnInit {
           private profileSvc:ProfileService,
           private wsSvc:WsService) {
       console.log(`HomeComponent: Constructor`);
-      
+
+  }
+
+  ngOnInit() {      
+    console.log(`HomeComponent: Init`);
+    
     Auth.currentAuthenticatedUser()
     .then(user =>{ 
-        console.log(`currentAuthenticatedUser:${user.username}`);
+        // console.log(`currentAuthenticatedUser:${user.username} User${JSON.stringify(user)}`);
+        const key:string=`CognitoIdentityServiceProvider.${user.pool.clientId}.${user.username}.idToken`;
+        console.log(`idToken:\n${user.storage[key]}`);
+        
         this.playerSvc.setActivePlayer(user.username);
         this.player = this.playerSvc.getActivePlayer();
         this.profileSvc.getProfile$(this.player.uuid).subscribe({
-          next:(profile)=>{console.log(`getProfile: ${JSON.stringify(profile)}`)},
+          next:(profile)=>{console.log(`Load Profile for ${this.player.uuid}: ${JSON.stringify(profile)}`)},
           error:(err)=>{console.log(`getProfile error: ${JSON.stringify(err)}`)}
         });
-        console.log(`Player: ${JSON.stringify(this.player)}`);
+        // console.log(`Player: ${JSON.stringify(this.player)}`);
         this.games$= this.gameSvc.getGames$(this.player.uuid,3);
         this.opponents$=this.playerSvc.getOpponents$(this.player.uuid);
         // wsSvc.connect();
         // wsSvc.login(this.player);
-    })
-    .catch(err => console.log(err)
-    );
-      this.wsSvc.onInvitation$().subscribe({
-          next:(invite)=>{this.invitations.push(invite);},
-          error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
-      });
-      this.wsSvc.onInvitationResponse$().subscribe({
-          next:(invite)=>{
-              if(invite.response){
-                  const game:IGameModel = this.gameSvc.newGame("new",this.player.uuid,invite.to.uuid,false); 
-                  this.wsSvc.joinGame(invite.to, game.uuid);
-                  this.router.navigate([`/play-area/${game.uuid}`]);
-              }
-          },
-          error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
-      });
-      this.wsSvc.onJoin$().subscribe({
-          next:(gameUuid)=>{
-              this.router.navigate([`/play-area/${gameUuid}`]);
-          },
-          error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
-      });
-  }
-
-  ngOnInit() {
-      
-    console.log(`HomeComponent: Init`);
+             
+        // this.wsSvc.onInvitation$().subscribe({
+        //     next:(invite)=>{this.invitations.push(invite);},
+        //     error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
+        // });
+        // this.wsSvc.onInvitationResponse$().subscribe({
+        //     next:(invite)=>{
+        //         if(invite.response){
+        //             const game:IGameModel = this.gameSvc.newGame("new",this.player.uuid,invite.to.uuid,false); 
+        //             this.wsSvc.joinGame(invite.to, game.uuid);
+        //             this.router.navigate([`/play-area/${game.uuid}`]);
+        //         }
+        //     },
+        //     error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
+        // });
+        // this.wsSvc.onJoin$().subscribe({
+        //     next:(gameUuid)=>{
+        //         this.router.navigate([`/play-area/${gameUuid}`]);
+        //     },
+        //     error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
+        // });
+      })
+      .catch(err => console.log(err)
+      );
   }
   
   newGame(){

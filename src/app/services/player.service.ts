@@ -54,7 +54,7 @@ export class PlayerService {
   getActivePlayer():IPlayerModel{
       return this._activePlayer;
   }
-  getOpponents$(uuid):Observable<Opponent[]>{
+  getOpponents$(uuid:string):Observable<Opponent[]>{
     const url = `${environment.apiGateway}/players/${uuid}/profile`;
       return new Observable<Opponent[]>((observer)=>{
           this.http.get<Opponent[]>(`${url}`).pipe(

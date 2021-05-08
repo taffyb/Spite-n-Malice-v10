@@ -1,5 +1,5 @@
 
-<h1>Welcome {{player.name}}</h1>
+<h1 *ngIf="player ; else loading">Welcome {{player.name}}</h1>
 
 <div class="link" (click)="newGame()">New Local Game</div> 
 <!-- <a  routerLink="/play-area/{{game.uuid}}">Go to game</a> -->
@@ -8,7 +8,7 @@
 <p>
 
 <p>
-Pending Invitations:
+<!-- Pending Invitations:
 <ul>
 	<li *ngFor="let invite of invitations">
 		<app-invitation [invite]="invite" 
@@ -28,5 +28,5 @@ Games:
 	<li *ngFor="let game of games">
  		<app-game-item [game]="game" ></app-game-item> 
 	</li>
-</ul>
+</ul> -->
 <ng-template #loading>Loading ...</ng-template>

@@ -11,18 +11,13 @@ import * as common from './service.common';
   providedIn: 'root',
 })
 export class GameService{
-    _games={};
+    private _games={};
     statusChanged: Subject<{status:GameStatesEnum, game: IGameModel}> = new Subject<{status:GameStatesEnum, game: IGameModel}>();
     constructor(private http:HttpClient, 
                 private dealerSvc:DealerService){
         console.log(`GameService.constructor`);
     }
-//    getGame(gameUuid:string):Game{
-//        if(!this._games[gameUuid]){
-//            throw new Error();
-//        }
-//        return this._games[gameUuid];
-//    }
+
     getGame$(gameUuid:string):Observable<Game>{
         let o:Observable<Game>;
         let self=this;

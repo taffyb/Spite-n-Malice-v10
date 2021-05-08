@@ -18,7 +18,7 @@ import { Game } from '../classes/games';
 })
 export class BurgerMenuComponent implements OnInit {
   @Input()player:IPlayerModel;
-  @Input()profile= DEFAULT_PROFILE;
+  profile;
   debugging:boolean = ('debugging' in environment);
     
   constructor(
@@ -32,6 +32,7 @@ export class BurgerMenuComponent implements OnInit {
   }
 
   onSettings(){
+    this.profile=this.profileSvc.getActiveProfile()
       console.log(`Settings clicked profile:${JSON.stringify(this.profile)}`);
       
       const dialogRef = this.dialog.open(ProfileDialogComponent, {
@@ -43,9 +44,9 @@ export class BurgerMenuComponent implements OnInit {
       dialogRef.afterClosed().subscribe(async result => {
           if(result.data){
               //merge profile
-              this.profile={...this.profile, ...result.data};  
+              this.profile={... this.profile, ...result.data};  
               console.log(`afterClose: ${JSON.stringify(this.profile)}`);
-              this.profileSvc.saveProfile(this.player.uuid,this.profile);
+              this.profileSvc.saveProfile('12345',this.profile);
           }
       });
   }
@@ -101,8 +102,7 @@ export class BurgerMenuComponent implements OnInit {
   onSignOut(){
     this.playerSvc.signOut();
     Auth.signOut()
-    .then(()=>{
-      
+    .then(()=>{      
       this.router.navigate(['/welcome']);
     })
     .catch(()=>console.error(`sign out error`));

@@ -30,6 +30,7 @@ export class PlayAreaComponent implements OnInit {
   pPE=PlayerPositionsEnum;
   cE=CardsEnum;
   mtE=MoveTypesEnum;
+
   players$:Observable<IPlayerModel[]>;
   profile:IProfileModel;
   game:Game;
@@ -68,18 +69,6 @@ export class PlayAreaComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.pageVisSvc.$onPageVisibilityChange.subscribe(( visibilityState: AngularPageVisibilityStateEnum ) => {
-    //     if ( visibilityState === AngularPageVisibilityStateEnum.VISIBLE ) {
-    //       console.log( 'OnInit => visibilityChange => visible' );
-    //     } else if (visibilityState === AngularPageVisibilityStateEnum.HIDDEN) {
-    //       console.log( 'OnInit => visibilityChange => hidden' );
-    //     } else if (visibilityState === AngularPageVisibilityStateEnum.PRERENDER) {
-    //       console.log( 'OnInit => visibilityChange => prerender' );
-    //     } else if (visibilityState === AngularPageVisibilityStateEnum.UNLOADED) {
-    //       console.log( 'OnInit => visibilityChange => unloaded' );
-    //     }
-    //   } );
-
     this.route.params.subscribe(async (val) => {
         const gameUuid = val.gameUuid;
         this.activeGameUuid = gameUuid;
@@ -87,7 +76,7 @@ export class PlayAreaComponent implements OnInit {
         if(gameUuid){
             try{
                 this.game = await this.gameSvc.getGame$(gameUuid).toPromise(); 
-                console.log(`player1Uuid:${this.game.player1Uuid}, player2Uuid:${this.game.player2Uuid}`);
+                // console.log(`player1Uuid:${this.game.player1Uuid}, player2Uuid:${this.game.player2Uuid}`);
                 this.players$=this.playerSvc.getPlayers$([this.game.player1Uuid,this.game.player2Uuid]).pipe(
                     tap((players)=>{
                         this.players=players;
@@ -113,13 +102,6 @@ export class PlayAreaComponent implements OnInit {
                 });
                 const activePlayer:IPlayerModel= this.playerSvc.getActivePlayer();
 //                  wsSvc.joinGame(activePlayer.uuid,this.game.uuid);
-//                  this.game.getCards(this.pE.PLAYER_PILE).splice(0,this.game.getCards(this.pE.PLAYER_PILE).length);
-//                  this.game.getCards(this.pE.PLAYER_PILE).push(new Card(this.cE.ACE,this.pE.PLAYER_PILE));
-//                  this.game.getCards(this.pE.PLAYER_HAND_1).splice(0,this.game.getCards(this.pE.PLAYER_HAND_1).length);
-//                  this.game.getCards(this.pE.PLAYER_HAND_1).push(new Card(this.cE.ACE,this.pE.PLAYER_HAND_1));
-//                  this.game.getCards(this.pE.PLAYER_HAND_1+10).splice(0,this.game.getCards(this.pE.PLAYER_HAND_1).length);
-//                  this.game.getCards(this.pE.DECK).splice(1,this.game.getCards(this.pE.DECK).length);
-//                  this.game.getCards(this.pE.PLAYER_HAND_1).push(new Card(this.cE.ACE,this.pE.PLAYER_HAND_1));
 
             }catch(err){
                 console.error(`catch block ${err} ${JSON.stringify(err)}`);
@@ -129,7 +111,7 @@ export class PlayAreaComponent implements OnInit {
     });
     console.log(`***** initialise play-area [${this.activeGameUuid}]`);
 
-    this.moveSvc.$onMoves.subscribe((ms)=>{
+    this.moveSvc.moves$.subscribe((ms)=>{
         // console.log(`moveSvc subscription [${ms.gameUuid}] [${ms.moves.length}] `);
         if(ms.gameUuid==this.activeGameUuid){
             this.performMoves(ms.gameUuid,ms.moves);
@@ -215,7 +197,7 @@ export class PlayAreaComponent implements OnInit {
           },1); 
       }else{
           setTimeout(()=>{ // If we are already animating then wait for the animation duration  before trying to start a new animation
-              this.nextMove();
+              this.startAnimation(m);
           },this.animationDuration(this.m));
       }
   }
@@ -225,13 +207,13 @@ export class PlayAreaComponent implements OnInit {
       if(evt.fromState=='from'){
         // move the card
         this.animating=false;
-        console.log(`play-area.performMove WITH ANIMATION`);
-        this.game.performMove(this.m);
+        // console.log(`play-area.performMove WITH ANIMATION`);
+        this.game.applyMove(this.m);
         if(this.m.type==this.mtE.PLAYER){
             if(this.m.isDiscard){
                 this.m=new Move();
                 this.animTrigger='from';
-                this.game.switchPlayer();
+                // this.game.switchPlayer();
                 if(this.game.local || this.playerSvc.getActivePlayer().uuid==movingPlayerUuid){
                     this.dealerSvc.fillHand(this.game.activePlayer, this.game);
                 }
@@ -276,12 +258,12 @@ export class PlayAreaComponent implements OnInit {
   */
   performMove(m:IMoveModel){
       let movingPlayerGuid = m.playerUuid;
-      console.log(`play-area.performMove NO ANIMATION`);
-      this.game.performMove(m);
+    //   console.log(`play-area.performMove NO ANIMATION`);
+      this.game.applyMove(m);
       if(m.type==this.mtE.PLAYER){
           if(m.isDiscard){
               this.m=new Move();
-              this.game.switchPlayer();
+            //   this.game.switchPlayer();
               this.dealerSvc.fillHand(this.game.activePlayer, this.game);
               this.gameSvc.updateGame(this.game.toModel());
           }else{
@@ -298,7 +280,7 @@ export class PlayAreaComponent implements OnInit {
                      to<=this.pE.STACK_4 &&  
                      (SMUtils.toFaceNumber(SMUtils.getTopOfStack(this.game.getCards(to)))== this.cE.KING)
                   ){
-                    console.log(`On Recycle this.player ${this.profileSvc.playerGuid}== ${movingPlayerGuid}`);
+                    // console.log(`On Recycle this.player ${this.profileSvc.playerGuid}== ${movingPlayerGuid}`);
                     this.moveSvc.moveToRecycle(this.game,to);
                 }
               }            
