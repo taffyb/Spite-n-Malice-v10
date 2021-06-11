@@ -2,7 +2,7 @@
 import {HttpHeaders} from '@angular/common/http';
 import { Observable, of, EMPTY } from 'rxjs';
 
-export const endpoint='http://localhost:4001/api/';
+export const endpoint='https://85b104by6f.execute-api.eu-west-2.amazonaws.com/sm_v2';
 export const httpOptions:any = {
         headers: new HttpHeaders({
             'Content-Type':  'application/json'

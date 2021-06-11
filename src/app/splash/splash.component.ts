@@ -8,7 +8,7 @@ import {IPlayerModel, IGameModel, IProfileModel} from 's-n-m-lib';
 import {PlayerService} from '../services/player.service';
 import {ProfileService} from '../services/profile.service';
 import {GameService} from '../services/game.service';
-import {MyAuthService} from '../services/auth.service';
+import {AuthService} from '../services/auth.service';
 import {MyAuthTypesEnum} from '../classes/auth.enums';
 import { Auth } from 'aws-amplify';
 
@@ -23,7 +23,7 @@ export class SplashComponent implements OnInit {
   constructor(
     private router: Router,
     private playerSvc:PlayerService,
-    private myAuthSvc:MyAuthService,
+    private myAuthSvc:AuthService,
     private profileSvc:ProfileService,
     private gameSvc:GameService,
     public dialog: MatDialog) 

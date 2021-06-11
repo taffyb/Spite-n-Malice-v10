@@ -2,7 +2,7 @@ import { Component, OnInit,Input,Output, EventEmitter } from '@angular/core';
 import { ProfileDialogComponent } from '../profile-dialog/profile-dialog.component';
 import { HelpDialogComponent } from '../help-dialog/help-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Card, DEFAULT_PROFILE, ICardModel, IPlayerModel, Move, PositionsEnum} from 's-n-m-lib';
+import { Card, DEFAULT_PROFILE, ICardModel, IGameModel, IPlayerModel, Move, PositionsEnum} from 's-n-m-lib';
 import { ProfileService} from '../services/profile.service';
 import { PlayerService} from '../services/player.service';
 import { GameService} from '../services/game.service';
@@ -78,6 +78,16 @@ export class BurgerMenuComponent implements OnInit {
         }
         out+="]";
         console.log(`${out}`);
+      },
+      error:(err)=>{console.error(`${err}`)}
+    });
+  }
+  onShowGame(){
+    let gameUuid = prompt("Enter GameUUID");
+    this.gameSvc.getGame$(gameUuid).subscribe({
+      next:(game:Game)=>{
+        const g:IGameModel = game.toModel();
+        console.log(`${JSON.stringify(g,null,2)}`);
       },
       error:(err)=>{console.error(`${err}`)}
     });

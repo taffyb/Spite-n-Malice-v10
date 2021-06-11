@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   apiGateway: 'https://fnze4245b6.execute-api.eu-west-2.amazonaws.com/dev',
+  wsGateway: 'wss://24gu6qsupj.execute-api.eu-west-2.amazonaws.com/dev',
   debugging:true
 };
 

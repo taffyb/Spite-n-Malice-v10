@@ -2,9 +2,10 @@ import {IGameModel, GameFactory, Game} from '../classes/games';
 import {ICardModel, Card, IPlayerModel} from 's-n-m-lib';
 import {PositionsEnum, CardsEnum,GameStatesEnum} from 's-n-m-lib';
 import {DealerService} from './dealer.service';
+import {AuthService} from './auth.service';
 import {Injectable} from '@angular/core';
 import {Observable, of, Subject} from 'rxjs';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient,HttpHeaders} from "@angular/common/http";
 import * as common from './service.common';
 
 @Injectable({
@@ -14,7 +15,8 @@ export class GameService{
     private _games={};
     statusChanged: Subject<{status:GameStatesEnum, game: IGameModel}> = new Subject<{status:GameStatesEnum, game: IGameModel}>();
     constructor(private http:HttpClient, 
-                private dealerSvc:DealerService){
+                private dealerSvc:DealerService, 
+                private authSvc:AuthService){
         console.log(`GameService.constructor`);
     }
 
@@ -42,9 +44,18 @@ export class GameService{
         });
     }
     getGames$(playerUuid?:string,limit?:number):Observable<IGameModel[]>{
-        const url = `${common.endpoint}games?${playerUuid?'playerUuid='+playerUuid:''}&${limit?'limit='+limit:''}`;
-//        console.log(`getGames$: ${url}`);
-        return this.http.get<IGameModel[]>(url);
+        const result:Subject<IGameModel[]> = new Subject<IGameModel[]>();
+        const url = `${common.endpoint}/players/games`;
+        console.log(`getGames$: ${url}`);
+        this.authSvc.getAccessJwtToken()
+        .then(token=>{
+            console.log(`token: ${JSON.stringify(token,null,2)}`);
+            const headers= new HttpHeaders()
+                .set('Authorization', token);
+            const http$ = this.http.get<IGameModel[]>(url,{headers:headers});
+            http$.subscribe(res=>{result.next(res)});
+        });
+        return result;
     }
     getGamesWith$(player:IPlayerModel,opponent:IPlayerModel):Observable<IGameModel[]>{
         const url = `${common.endpoint}games?${player.uuid?'playerUuid='+player.uuid:''}&opponent=${opponent.uuid}`;

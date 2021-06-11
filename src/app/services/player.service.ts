@@ -32,24 +32,24 @@ export class PlayerService {
               private wsSvc:WsService,
               private profileSvc:ProfileService) {
     console.log(`PlayerService.constructor`);
-    wsSvc.onPlayerActive$().subscribe({
-        next:(p:IPlayerModel)=>{
-            console.log(`${p.name} is now active`);
-            this.updateOpponentStatus(p);
-        },
-        error:(err)=>{
-            console.log(`onPlayerActive error: ${JSON.stringify(err)}`);
-        }
-    });
-    wsSvc.onDisconnect$().subscribe({
-        next:(opponent:IPlayerModel)=>{
-            console.log(`${opponent.name} is now offline`);
-            this.updateOpponentStatus(opponent);
-        },
-        error:(err)=>{
-            console.log(`onDisconnect$ error: ${JSON.stringify(err)}`);
-        }
-    });
+    // wsSvc.onPlayerActive$().subscribe({
+    //     next:(p:IPlayerModel)=>{
+    //         console.log(`${p.name} is now active`);
+    //         this.updateOpponentStatus(p);
+    //     },
+    //     error:(err)=>{
+    //         console.log(`onPlayerActive error: ${JSON.stringify(err)}`);
+    //     }
+    // });
+    // wsSvc.onDisconnect$().subscribe({
+    //     next:(opponent:IPlayerModel)=>{
+    //         console.log(`${opponent.name} is now offline`);
+    //         this.updateOpponentStatus(opponent);
+    //     },
+    //     error:(err)=>{
+    //         console.log(`onDisconnect$ error: ${JSON.stringify(err)}`);
+    //     }
+    // });
   }
   getActivePlayer():IPlayerModel{
       return this._activePlayer;
@@ -66,15 +66,15 @@ export class PlayerService {
           )).subscribe();                  
        });
   }
-  updateOpponentStatus(opponent:IPlayerModel){
-      this._opponents.forEach((opp)=>{
-          if(opp.uuid===opponent.uuid){
-              opp.online=(!opp.online);
-          }
-          console.log(`opponent[${opp.uuid}] is online=${opp.online}`);
-      });
-      this._opponentObserver.next(this._opponents);
-  }
+//   updateOpponentStatus(opponent:IPlayerModel){
+//       this._opponents.forEach((opp)=>{
+//           if(opp.uuid===opponent.uuid){
+//               opp.online=(!opp.online);
+//           }
+//           console.log(`opponent[${opp.uuid}] is online=${opp.online}`);
+//       });
+//       this._opponentObserver.next(this._opponents);
+//   }
   getPlayerByName$(name:string):Observable<IPlayerModel>{
       console.log(`player.service getPlayerByName$ name:${name}`);
       let player$:Observable<IPlayerModel>;
@@ -129,13 +129,13 @@ export class PlayerService {
       });
       return of(players);
   }
-  getAllPlayers$():Observable<IPlayerModel[]>{ 
-      const players$:Observable<IPlayerModel[]>=of(this._players);
-      this._players.forEach((p)=>{
-          this._playersByGuid[p.uuid]=p;
-      });
-      return players$;
-  }
+//   getAllPlayers$():Observable<IPlayerModel[]>{ 
+//       const players$:Observable<IPlayerModel[]>=of(this._players);
+//       this._players.forEach((p)=>{
+//           this._playersByGuid[p.uuid]=p;
+//       });
+//       return players$;
+//   }
 //  async addPlayer(player:IPlayerModel):boolean{
 //      if(player.guid && player.guid.length >0){
 //          return this.updatePlayer(player);

@@ -3,6 +3,7 @@
 	  <button mat-menu-item (click)="onSettings()">Settings</button>
 	  <button mat-menu-item (click)="onHelp()">Help</button>
 	  <button *ngIf="debugging" mat-menu-item (click)="onShowCards()">Show Cards</button>
+	  <button *ngIf="debugging" mat-menu-item (click)="onShowGame()">Show Game</button>
 	  <button *ngIf="debugging" mat-menu-item (click)="onSetCards()">Set Cards</button>
 	  <button mat-menu-item (click)="onSignOut()">Sign Out</button>
 	</mat-menu>

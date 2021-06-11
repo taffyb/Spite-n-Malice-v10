@@ -7,6 +7,7 @@ import {WsService} from '../services/ws.service';
 import {IGameModel} from '../classes/games';
 import {IPlayerModel, IInvitationMessage} from 's-n-m-lib';
 import { Auth } from 'aws-amplify';
+import { AuthService } from '../services/auth.service';
 
 
 @Component({
@@ -16,7 +17,6 @@ import { Auth } from 'aws-amplify';
 })
 export class HomeComponent implements OnInit {
   player:IPlayerModel;
-//   game:IGameModel;
   games$;
   opponents$;
   invitations:IInvitationMessage[]=[];
@@ -26,6 +26,7 @@ export class HomeComponent implements OnInit {
           private route: ActivatedRoute,
           private gameSvc:GameService,
           private playerSvc:PlayerService,
+          private authSvc:AuthService,
           private profileSvc:ProfileService,
           private wsSvc:WsService) {
       console.log(`HomeComponent: Constructor`);
@@ -38,8 +39,8 @@ export class HomeComponent implements OnInit {
     Auth.currentAuthenticatedUser()
     .then(user =>{ 
         // console.log(`currentAuthenticatedUser:${user.username} User${JSON.stringify(user)}`);
-        const key:string=`CognitoIdentityServiceProvider.${user.pool.clientId}.${user.username}.idToken`;
-        console.log(`idToken:\n${user.storage[key]}`);
+        // const key:string=`CognitoIdentityServiceProvider.${user.pool.clientId}.${user.username}.idToken`;
+        // console.log(`idToken:\n${user.storage[key]}`);        
         
         this.playerSvc.setActivePlayer(user.username);
         this.player = this.playerSvc.getActivePlayer();
@@ -50,28 +51,12 @@ export class HomeComponent implements OnInit {
         // console.log(`Player: ${JSON.stringify(this.player)}`);
         this.games$= this.gameSvc.getGames$(this.player.uuid,3);
         this.opponents$=this.playerSvc.getOpponents$(this.player.uuid);
-        // wsSvc.connect();
-        // wsSvc.login(this.player);
-             
-        // this.wsSvc.onInvitation$().subscribe({
-        //     next:(invite)=>{this.invitations.push(invite);},
-        //     error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
-        // });
-        // this.wsSvc.onInvitationResponse$().subscribe({
-        //     next:(invite)=>{
-        //         if(invite.response){
-        //             const game:IGameModel = this.gameSvc.newGame("new",this.player.uuid,invite.to.uuid,false); 
-        //             this.wsSvc.joinGame(invite.to, game.uuid);
-        //             this.router.navigate([`/play-area/${game.uuid}`]);
-        //         }
-        //     },
-        //     error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
-        // });
-        // this.wsSvc.onJoin$().subscribe({
-        //     next:(gameUuid)=>{
-        //         this.router.navigate([`/play-area/${gameUuid}`]);
-        //     },
-        //     error:(err)=>{console.log(`onPlayerActive error: ${JSON.stringify(err)}`);}
+        // this.wsSvc.connect();
+        
+        // this.authSvc.getAccessJwtToken()
+        // .then(token=>{
+        //   console.log(token);
+          
         // });
       })
       .catch(err => console.log(err)
@@ -83,15 +68,16 @@ export class HomeComponent implements OnInit {
     const g:IGameModel = this.gameSvc.newGame("game", this.playerSvc.getActivePlayer().uuid, "Player2",true);
     // this.game = g;
     const url:string = `/play-area/${g.uuid}`;
-    console.log(`route to new game: ${url}`);
+    // console.log(`route to new game: ${url}`);
     this.router.navigate([url]);
   }
   sendInvite(opponent:IPlayerModel){
       console.log(`Asking ${opponent.name} to play a game`);
-      this.wsSvc.sendInvite(this.player,opponent);
+      let invite:IInvitationMessage = {from:this.player,to:opponent,timestamp:Date.now()};
+      this.wsSvc.send("invititation",invite);
   }
-  sendInviteResponse(response:string,invite:IInvitationMessage){
-      this.wsSvc.sendInviteResponse(response, invite);
+  sendInviteResponse(invite:IInvitationMessage){
+      this.wsSvc.send<IInvitationMessage>("invitationResponse",invite);
       
       this.invitations.forEach((i:IInvitationMessage,j)=>{
           if(i.uuid===invite.uuid){

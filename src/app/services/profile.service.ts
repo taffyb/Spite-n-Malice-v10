@@ -67,7 +67,7 @@ export class ProfileService {
   }
   getDefaultProfile$():Observable<IProfileModel>{
       this._profile=DEFAULT_PROFILE;
-      this._profile.showStatistics=false;
+      // this._profile.showStatistics=false;
       return of(this._profile);
   }
   

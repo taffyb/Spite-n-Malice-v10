@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { MyAuthService} from './auth.service';
+import { AuthService} from './auth.service';
 import {MyAuthTypesEnum} from '../classes/auth.enums';
 
 @Injectable({
@@ -8,7 +8,7 @@ import {MyAuthTypesEnum} from '../classes/auth.enums';
 })
 export class AuthGuardService implements CanActivate {  
   constructor( public router: Router,
-               private myAuthSvc:MyAuthService ) {} 
+               private myAuthSvc:AuthService ) {} 
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot):  boolean {

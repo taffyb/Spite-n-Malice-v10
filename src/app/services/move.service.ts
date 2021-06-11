@@ -25,15 +25,15 @@ export class MoveService{
     }
     moves$: Subject<{gameUuid: string, moves: IMoveModel[]}> = new Subject<{gameUuid: string, moves: IMoveModel[]}>();
     init(){
-        if( this.wsSvc.connected){
-            this.wsSvc.onRecieveMoves$().subscribe({
-                next:(moves:IMoveMessage)=>{
-                    console.log(`MoveService.wsSvc.onRecieveMoves$ ${JSON.stringify(moves)}`);
-                    this.publishMoves(moves.gameUuid,moves.moves)
-                },
-                error:(err)=>{console.error(`onReceiveMoves error: ${JSON.stringify(err)}`)}
-            }); 
-        }
+        // if( this.wsSvc.connected){
+        //     this.wsSvc.onRecieveMoves$().subscribe({
+        //         next:(moves:IMoveMessage)=>{
+        //             console.log(`MoveService.wsSvc.onRecieveMoves$ ${JSON.stringify(moves)}`);
+        //             this.publishMoves(moves.gameUuid,moves.moves)
+        //         },
+        //         error:(err)=>{console.error(`onReceiveMoves error: ${JSON.stringify(err)}`)}
+        //     }); 
+        // }
     }
     // subscribeToMoves(gameUuid: string, callback:(ms:{gameUuid: string,  moves: IMoveModel[]}) => any){
     //     if(!this.subscribers[gameUuid]){
@@ -80,7 +80,7 @@ export class MoveService{
                 const opponent = (activePlayer===1?0:1);
                 const moveMessage:IMoveMessage=
                     {moves:ms,from:players[activePlayer],to:players[opponent],gameUuid:game.uuid};
-                this.wsSvc.publishMoves(moveMessage);
+                // this.wsSvc.publishMoves(moveMessage);
             }
             this.saveMoves(game.uuid,ms);
         }
@@ -100,7 +100,7 @@ export class MoveService{
          });
     }
     moveToRecycle(game: Game, position: number){
-        const moves:IMoveModel[]=[];
+        const moves:IMoveModel[]=[]; 
         for(let i = game.getCards(position).length-1; i>=0; i--){
             let c = game.getCards(position)[i];
             let m = new Move();

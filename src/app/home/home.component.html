@@ -12,11 +12,11 @@
 <ul>
 	<li *ngFor="let invite of invitations">
 		<app-invitation [invite]="invite" 
-						(onAccept)="sendInviteResponse('accept',$event)" 
-						(onDecline)="sendInviteResponse('decline',$event)">
+						(onAccept)="sendInviteResponse($event)" 
+						(onDecline)="sendInviteResponse($event)">
 		</app-invitation>
 	</li>
-</ul>
+</ul> -->
 Opponents:
 <ul *ngIf="opponents$ | async as opponents; else loading">
 	<li *ngFor="let opponent of opponents">
@@ -28,5 +28,5 @@ Games:
 	<li *ngFor="let game of games">
  		<app-game-item [game]="game" ></app-game-item> 
 	</li>
-</ul> -->
+</ul>
 <ng-template #loading>Loading ...</ng-template>

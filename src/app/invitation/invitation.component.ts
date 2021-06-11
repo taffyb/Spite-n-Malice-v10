@@ -17,9 +17,11 @@ export class InvitationComponent implements OnInit {
   }
   
   accept(){
-      this.onAccept.emit(this.invite);
+    this.invite.response=true;
+    this.onAccept.emit(this.invite);
   }
   decline(){
-      this.onDecline.emit(this.invite);
+    this.invite.response=false;
+    this.onDecline.emit(this.invite);
   }
 }

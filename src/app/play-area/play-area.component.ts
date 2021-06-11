@@ -17,7 +17,6 @@ import {PlayerService} from '../services/player.service';
 import {ProfileService} from '../services/profile.service';
 import {WsService} from '../services/ws.service';
 import {Animations,DEFAULT_DURATIONS} from './animation';
-import { identifierModuleUrl } from '@angular/compiler';
 
 @Component({
   selector: 'app-play-area',

@@ -3,7 +3,7 @@ import {Observable} from 'rxjs';
 // import {AuthService} from './services/auth.service';
 // import {AuthTypesEnum} from './classes/auth.enums';
 import { onAuthUIStateChange, CognitoUserInterface, AuthState } from '@aws-amplify/ui-components';
-import { MyAuthService } from './services/auth.service';
+import { AuthService } from './services/auth.service';
 import {ProfileService} from './services/profile.service';
 import {GameService} from './services/game.service';
 import {PlayerService} from './services/player.service';
@@ -35,7 +35,7 @@ export class AppComponent implements OnInit {
             private profileSvc:ProfileService,
             private gameSvc:GameService,
             private playerSvc:PlayerService,
-            private myAuthSvc:MyAuthService,
+            private myAuthSvc:AuthService,
             private authGuardSvc:AuthGuardService,
             private ref: ChangeDetectorRef,
             public dialog: MatDialog
