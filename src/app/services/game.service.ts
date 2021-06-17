@@ -1,12 +1,14 @@
+
+import {HttpClient,HttpHeaders} from "@angular/common/http";
+import {Injectable} from '@angular/core';
 import {IGameModel, GameFactory, Game} from '../classes/games';
-import {ICardModel, Card, IPlayerModel} from 's-n-m-lib';
-import {PositionsEnum, CardsEnum,GameStatesEnum} from 's-n-m-lib';
+import {Card, ICardModel, GameStatesEnum} from 's-n-m-lib';
 import {DealerService} from './dealer.service';
 import {AuthService} from './auth.service';
-import {Injectable} from '@angular/core';
-import {Observable, of, Subject} from 'rxjs';
-import {HttpClient,HttpHeaders} from "@angular/common/http";
 import * as common from './service.common';
+import {Observable, of, Subject} from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { MyAuthTypesEnum } from "../classes/auth.enums";
 
 @Injectable({
   providedIn: 'root',
@@ -17,49 +19,57 @@ export class GameService{
     constructor(private http:HttpClient, 
                 private dealerSvc:DealerService, 
                 private authSvc:AuthService){
-        console.log(`GameService.constructor`);
+        // console.log(`GameService.constructor`);
     }
 
     getGame$(gameUuid:string):Observable<Game>{
-        let o:Observable<Game>;
-        let self=this;
+        const result:Subject<Game> = new Subject<Game>();
         console.log(`getGame$: ${gameUuid}`);
-        return new Observable<Game>(subscriber => {
-            if(!this._games[gameUuid]){   
-                const url = `${common.endpoint}games/${gameUuid}`;
-                console.log(`getGame$.url: ${url}`);
-                this.http.get<IGameModel>(url).subscribe({
-                    next(g:IGameModel) { 
-                        const game:Game= Game.fromModel(g); 
-                        subscriber.next(game);
-                        subscriber.complete();
-                    },
-                    error(err) { console.error(`Error calling ${url}: ${JSON.stringify(err)}`); }
-                  });
-            }else{
-                console.log(`getGame$ get from cache`);
-                subscriber.next(this._games[gameUuid]);
-                subscriber.complete();
-            }           
-        });
+        if(this.authSvc.getAuthStatus()==MyAuthTypesEnum.AUTHENTICATED){
+            return new Observable<Game>(subscriber => {
+                if(!this._games[gameUuid]){   
+                    const url = `${common.endpoint}/games/${gameUuid}`;
+                    this.authSvc.getAccessJwtToken()
+                    .then(token=>{
+                        console.log(`token:\n${token}`);
+                        const headers= new HttpHeaders().set('Authorization', token);
+                        const http$ = this.http.get<Game>(url,{headers:headers});
+                        http$.subscribe(g=>{
+                            const game:Game = Game.fromModel(this.game2UiGame(Game.fromModel(g)));
+                            this._games[gameUuid]=game;
+                            this.statusChanged.next({status: GameStatesEnum.NEW, game: game});
+                            result.next(game);
+                            result.complete();
+                        })
+                      });
+                }else{
+                    console.log(`getGame$ get from cache`);
+                    result.next(this._games[gameUuid]);
+                    result.complete();
+                }           
+            });
+        }else{
+            console.log(`getGame$ get from cache`);
+            return of(this._games[gameUuid]);
+        }
     }
-    getGames$(playerUuid?:string,limit?:number):Observable<IGameModel[]>{
+    getGames$(limit?:number):Observable<IGameModel[]>{
         const result:Subject<IGameModel[]> = new Subject<IGameModel[]>();
         const url = `${common.endpoint}/players/games`;
         console.log(`getGames$: ${url}`);
         this.authSvc.getAccessJwtToken()
         .then(token=>{
-            console.log(`token: ${JSON.stringify(token,null,2)}`);
-            const headers= new HttpHeaders()
-                .set('Authorization', token);
+            console.log(`token:\n${token}`);
+            const headers= new HttpHeaders().set('Authorization', token);
             const http$ = this.http.get<IGameModel[]>(url,{headers:headers});
-            http$.subscribe(res=>{result.next(res)});
+            http$.pipe(
+                // tap((games)=>{
+                //     console.log(`games ${JSON.stringify(games,null,2)}`);                    
+                // })
+                
+            ).subscribe(res=>{result.next(res)});
         });
         return result;
-    }
-    getGamesWith$(player:IPlayerModel,opponent:IPlayerModel):Observable<IGameModel[]>{
-        const url = `${common.endpoint}games?${player.uuid?'playerUuid='+player.uuid:''}&opponent=${opponent.uuid}`;
-        return this.http.get<IGameModel[]>(url);
     }
     newGame(name:string,player1Uuid:string,player2Uuid:string,local:boolean):Game{
         const deck:number[] = this.dealerSvc.getDeck();
@@ -71,23 +81,13 @@ export class GameService{
         return game;
     }
     saveGame(game:IGameModel){
-        
-        this.http.post<IGameModel>(`${common.endpoint}games`,game).subscribe(
-                (val) => {
-                    console.log(`saveGame Success [${game.uuid}]`);
-                },
-                response => {
-                    if(response.status===0){
-                        console.error("Server Unavailable");
-                    }else{
-                        console.error("Error Saving Game", response);
-                    }
-                });
+        console.log(`saveGame [${game.uuid}]`);
+        this.http.post<IGameModel>(`${common.endpoint}/games`,this.uiGame2Game(game)).subscribe();
     }
     updateGame(game:IGameModel){
         
         game.updateDateTime=""+Date.now();
-        this.http.put<boolean>(`${common.endpoint}games/${game.uuid}?activePlayer=true`,game).subscribe(
+        this.http.put<boolean>(`${common.endpoint}/games/${game.uuid}?activePlayer=true`,this.uiGame2Game(game)).subscribe(
                 (val) => {
                     console.log(`updateGame Success`);
                 },
@@ -98,7 +98,7 @@ export class GameService{
     updateGameName(game:IGameModel){
         
         game.updateDateTime=""+Date.now();
-        this.http.put<boolean>(`${common.endpoint}games/${game.uuid}?name=true`,game).subscribe(
+        this.http.put<boolean>(`${common.endpoint}/games/${game.uuid}?name=true`,this.uiGame2Game(game)).subscribe(
                 (val) => {
                     console.log(`updateName Success`);
                 },
@@ -109,7 +109,7 @@ export class GameService{
     updateGameState(game:IGameModel){
         
         game.updateDateTime=""+Date.now();
-        this.http.put<boolean>(`${common.endpoint}games/${game.uuid}?state=true`,game).subscribe(
+        this.http.put<boolean>(`${common.endpoint}/games/${game.uuid}?state=true`,this.uiGame2Game(game)).subscribe(
                 (val) => {
                     console.log(`updateState[${GameStatesEnum[game.state]}] Success`);
                 },
@@ -119,5 +119,42 @@ export class GameService{
     }
     setGame(gameUuid:string,cards:ICardModel[][]){
         this._games[gameUuid].cards=cards;
+    }
+
+    private game2UiGame(game):IGameModel{
+        const cards:ICardModel[][]=[];
+        const g:IGameModel = Game.fromModel(game);
+        game.cards.forEach((a,i)=>{
+            cards.push([]);
+            a.forEach(c=>{
+                cards[i].push(new Card(c,i));
+            });
+        });
+        g.cards= cards;
+        return g;
+    }
+
+    private uiGame2Game(game:IGameModel):any{
+        const g={};
+        const cards:number[][]=[];
+
+        game.cards.forEach((a,i)=>{
+            cards.push([]);
+            a.forEach(c=>{
+                cards[i].push(c.cardNo);
+
+            });
+        });
+        g['name'] = game.name;
+        g['uuid'] = game.uuid;
+        g['state'] = game.state;
+        g['createDateTime'] = game.createDateTime;
+        g['player1Uuid'] = game.player1Uuid;
+        g['player2Uuid'] = game.player2Uuid;
+        g['activePlayer'] = game.activePlayer;
+        g['cards'] = cards;
+        g['local'] = game.local;
+
+        return g;
     }
 }

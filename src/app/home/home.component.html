@@ -26,7 +26,8 @@ Opponents:
 Games:
 <ul *ngIf="games$ | async as games else loading">
 	<li *ngFor="let game of games">
+		<!-- {{game.name}} | {{game.uuid}} | {{game.createDateTime}} | {{game.state}} -->
  		<app-game-item [game]="game" ></app-game-item> 
 	</li>
 </ul>
-<ng-template #loading>Loading ...</ng-template>
+<ng-template #loading>Loading ...<br></ng-template>

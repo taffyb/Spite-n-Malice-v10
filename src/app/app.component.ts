@@ -35,7 +35,7 @@ export class AppComponent implements OnInit {
             private profileSvc:ProfileService,
             private gameSvc:GameService,
             private playerSvc:PlayerService,
-            private myAuthSvc:AuthService,
+            private authSvc:AuthService,
             private authGuardSvc:AuthGuardService,
             private ref: ChangeDetectorRef,
             public dialog: MatDialog
@@ -55,7 +55,7 @@ export class AppComponent implements OnInit {
             }
             
         });
-        console.log(`AppComponent: Constructor`);
+        // console.log(`AppComponent: Constructor`);
     }
     onSelectTab(tabName){
         this.selectedTabName=tabName;
@@ -76,8 +76,9 @@ export class AppComponent implements OnInit {
         this.user = authData as CognitoUserInterface;
         this.ref.detectChanges();
         if(this.authState==AuthState.SignedIn){
-            this.playerSvc.setActivePlayer(this.user.username);
-            this.myAuthSvc.setAuthStatus(MyAuthTypesEnum.AUTHENTICATED);
+            
+            // this.playerSvc.setActivePlayer(this.user.username);
+            this.authSvc.setAuthStatus(MyAuthTypesEnum.AUTHENTICATED);
             this.router.navigate(['/home']);
 
         }
@@ -101,7 +102,7 @@ export class AppComponent implements OnInit {
    async loadProfile(player){
        console.log(`AppComponent.loadProfile player:${JSON.stringify(player)}`);
         if(player)  {          
-            this.profile$=this.profileSvc.getProfile$(player.uuid); 
+            this.profile$=this.profileSvc.getProfile$(); 
             this.router.navigate(['/home']);
         }
     }

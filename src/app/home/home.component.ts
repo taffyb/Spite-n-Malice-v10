@@ -8,6 +8,7 @@ import {IGameModel} from '../classes/games';
 import {IPlayerModel, IInvitationMessage} from 's-n-m-lib';
 import { Auth } from 'aws-amplify';
 import { AuthService } from '../services/auth.service';
+import { MyAuthTypesEnum } from '../classes/auth.enums';
 
 
 @Component({
@@ -38,29 +39,21 @@ export class HomeComponent implements OnInit {
     
     Auth.currentAuthenticatedUser()
     .then(user =>{ 
-        // console.log(`currentAuthenticatedUser:${user.username} User${JSON.stringify(user)}`);
-        // const key:string=`CognitoIdentityServiceProvider.${user.pool.clientId}.${user.username}.idToken`;
-        // console.log(`idToken:\n${user.storage[key]}`);        
-        
-        this.playerSvc.setActivePlayer(user.username);
-        this.player = this.playerSvc.getActivePlayer();
-        this.profileSvc.getProfile$(this.player.uuid).subscribe({
-          next:(profile)=>{console.log(`Load Profile for ${this.player.uuid}: ${JSON.stringify(profile)}`)},
+      console.log(`HomeComponent.currentAuthenticatedUser: ${user.username}`);
+      
+      this.playerSvc.getPlayer$().subscribe(player=>{
+        console.log(`HomeComponent.getPlayer$: ${JSON.stringify(player,null,2)}`);
+        this.profileSvc.getProfile$().subscribe({
+          next:(profile)=>{console.log(`Load Profile for ${player.uuid}: ${JSON.stringify(profile)}`)},
           error:(err)=>{console.log(`getProfile error: ${JSON.stringify(err)}`)}
         });
-        // console.log(`Player: ${JSON.stringify(this.player)}`);
-        this.games$= this.gameSvc.getGames$(this.player.uuid,3);
-        this.opponents$=this.playerSvc.getOpponents$(this.player.uuid);
-        // this.wsSvc.connect();
-        
-        // this.authSvc.getAccessJwtToken()
-        // .then(token=>{
-        //   console.log(token);
-          
-        // });
-      })
-      .catch(err => console.log(err)
-      );
+        this.games$= this.gameSvc.getGames$(3);
+        // this.opponents$=this.playerSvc.getOpponents$(this.player.uuid);
+        if(this.authSvc.getAuthStatus()==MyAuthTypesEnum.AUTHENTICATED){
+          this.wsSvc.connect();
+        }
+      });
+    });         
   }
   
   newGame(){

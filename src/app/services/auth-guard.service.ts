@@ -8,7 +8,7 @@ import {MyAuthTypesEnum} from '../classes/auth.enums';
 })
 export class AuthGuardService implements CanActivate {  
   constructor( public router: Router,
-               private myAuthSvc:AuthService ) {} 
+               private authSvc:AuthService ) {} 
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot):  boolean {
@@ -17,7 +17,7 @@ export class AuthGuardService implements CanActivate {
     return this.isVisible(next.url[0].toString());
   }
   isVisible(target:string):boolean{
-      const authStatus:MyAuthTypesEnum = this.myAuthSvc.getAuthStatus();
+      const authStatus:MyAuthTypesEnum = this.authSvc.getAuthStatus();
       let visible=false;
       target=target.split('/')[0];
       switch(target){

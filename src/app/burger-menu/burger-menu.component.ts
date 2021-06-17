@@ -46,7 +46,7 @@ export class BurgerMenuComponent implements OnInit {
               //merge profile
               this.profile={... this.profile, ...result.data};  
               console.log(`afterClose: ${JSON.stringify(this.profile)}`);
-              this.profileSvc.saveProfile('12345',this.profile);
+              this.profileSvc.saveProfile(this.profile);
           }
       });
   }
@@ -110,7 +110,6 @@ export class BurgerMenuComponent implements OnInit {
     this.gameSvc.setGame(gameUUID,cards);
   }
   onSignOut(){
-    this.playerSvc.signOut();
     Auth.signOut()
     .then(()=>{      
       this.router.navigate(['/welcome']);

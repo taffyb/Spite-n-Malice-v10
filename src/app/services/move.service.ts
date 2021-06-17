@@ -16,38 +16,17 @@ import {PlayerService} from './player.service';
 export class MoveService{
     private _moves:IMoveModel[][] = []; //key by game UUID so can hold the moves for multiple games at same time.
  
-    // private subscribers={};
     constructor(private http: HttpClient,
             private wsSvc: WsService,
             private playerSvc: PlayerService){
-        console.log(`MoveService.constructor`);
+        // console.log(`MoveService.constructor`);
  
     }
     moves$: Subject<{gameUuid: string, moves: IMoveModel[]}> = new Subject<{gameUuid: string, moves: IMoveModel[]}>();
     init(){
-        // if( this.wsSvc.connected){
-        //     this.wsSvc.onRecieveMoves$().subscribe({
-        //         next:(moves:IMoveMessage)=>{
-        //             console.log(`MoveService.wsSvc.onRecieveMoves$ ${JSON.stringify(moves)}`);
-        //             this.publishMoves(moves.gameUuid,moves.moves)
-        //         },
-        //         error:(err)=>{console.error(`onReceiveMoves error: ${JSON.stringify(err)}`)}
-        //     }); 
-        // }
     }
-    // subscribeToMoves(gameUuid: string, callback:(ms:{gameUuid: string,  moves: IMoveModel[]}) => any){
-    //     if(!this.subscribers[gameUuid]){
-    //         this.subscribers[gameUuid] = callback
-    //     }
-    // }
     publishMoves(gameUuid: string,ms: IMoveModel[]){
         const movesToPublish = {gameUuid: gameUuid, moves: ms}
-        // console.log(`MoveService.publishMoves ${JSON.stringify(movesToPublish)}`);
-        // for(let key in this.subscribers){
-        //     if(key == gameUuid){
-        //         this.subscribers[key]({gameUuid:gameUuid,moves:ms});
-        //     }
-        // }
         this.moves$.next(movesToPublish);
     }    
     addMove(game: IGameModel, playerUuid: string, m: IMoveModel){
@@ -86,18 +65,19 @@ export class MoveService{
         }
     }
     saveMoves(gameUuid: string,ms: IMoveModel[]){
-        ms.forEach((move)=>{   
-            this.http.post<IMoveModel>(`${common.endpoint}games/${gameUuid}/moves`,move).subscribe(
+        // ms.forEach((move)=>{   
+            this.http.put<IMoveModel>(`${common.endpoint}/games/${gameUuid}/moves`,ms).subscribe(
                 (val) => {
                     console.log(`POST call successful value returned in body ${JSON.stringify(val)}`);
                 },
                 response => {
                     if(response.status != 200){
-                        console.error(`Error posting move:${JSON.stringify(move)}
+                        console.error(`Error posting move:${JSON.stringify(ms,null,2)}
                         ${JSON.stringify(response)}`);
                     }
-                });
-         });
+                }
+            );
+        //  });
     }
     moveToRecycle(game: Game, position: number){
         const moves:IMoveModel[]=[]; 
@@ -115,7 +95,7 @@ export class MoveService{
         this.addMoves(game,"",moves);
     }
     getMoves$(gameUuid:string,playerUuid?:string,limit?:number):Observable<IMoveModel[]>{
-        const url = `${common.endpoint}games/${gameUuid}/moves?${playerUuid?'playerUuid='+playerUuid:''}&${limit?'limit='+limit:''}`;
+        const url = `${common.endpoint}/games/${gameUuid}/moves?${playerUuid?'playerUuid='+playerUuid:''}&${limit?'limit='+limit:''}`;
         return this.http.get<IMoveModel[]>(url).pipe(
             map((data)=>{
                 const moves:IMoveModel[]=[];

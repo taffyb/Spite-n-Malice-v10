@@ -19,7 +19,6 @@ import { ModalDialog } from './modal-dialog/modal-dialog';
 import { HelpDialogComponent } from './help-dialog/help-dialog.component';
 import { HomeComponent } from './home/home.component';
 import { SplashComponent } from './splash/splash.component';
-import { TimezoneTestComponent } from './timezone-test/timezone-test.component';
 import { InvitationComponent } from './invitation/invitation.component';
 import { GameItemComponent } from './game-item/game-item.component';
 import { MoveRptComponent } from './move-rpt/move-rpt.component';
@@ -54,7 +53,6 @@ Amplify.configure(awsconfig);
     HelpDialogComponent,
     HomeComponent,
     SplashComponent,
-    TimezoneTestComponent,
     MoveRptComponent,
     GaugeComponent,
     OpponentComponent,

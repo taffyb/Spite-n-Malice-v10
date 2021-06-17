@@ -1,25 +1,25 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import {Observable, of} from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
 import * as common from './service.common';
 import {WsService} from './ws.service';
 import {ProfileService} from './profile.service';
+import {AuthService} from './auth.service';
 import {IPlayerModel,Opponent} from 's-n-m-lib';
 import {environment} from '../../environments/environment';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerService {
-  private _players:IPlayerModel[]= [{uuid:'taffy',name:'taffy'},
+  private _players:IPlayerModel[]= [{uuid:'111111',name:'Player1'},
                                     {uuid:'987654',name:'Suzannah'},
                                     {uuid:'111111',name:'Player1'},
                                     {uuid:'222222',name:'Player2'}];
-  private _playersByGuid={          
-                          'taffy':{uuid:'taffy',name:'taffy'},
-                          '987654':{uuid:'987654',name:'Suzannah'},
+  private _playersByGuid={
                           '111111':{uuid:'111111',name:'Player1'},
                           '222222':{uuid:'222222',name:'Player2'}
                          };
@@ -30,51 +30,27 @@ export class PlayerService {
 
   constructor(private http:HttpClient,
               private wsSvc:WsService,
-              private profileSvc:ProfileService) {
-    console.log(`PlayerService.constructor`);
-    // wsSvc.onPlayerActive$().subscribe({
-    //     next:(p:IPlayerModel)=>{
-    //         console.log(`${p.name} is now active`);
-    //         this.updateOpponentStatus(p);
-    //     },
-    //     error:(err)=>{
-    //         console.log(`onPlayerActive error: ${JSON.stringify(err)}`);
-    //     }
-    // });
-    // wsSvc.onDisconnect$().subscribe({
-    //     next:(opponent:IPlayerModel)=>{
-    //         console.log(`${opponent.name} is now offline`);
-    //         this.updateOpponentStatus(opponent);
-    //     },
-    //     error:(err)=>{
-    //         console.log(`onDisconnect$ error: ${JSON.stringify(err)}`);
-    //     }
-    // });
+              private profileSvc:ProfileService,
+              private authSvc:AuthService) {
+    // console.log(`PlayerService.constructor`);
   }
   getActivePlayer():IPlayerModel{
       return this._activePlayer;
   }
-  getOpponents$(uuid:string):Observable<Opponent[]>{
-    const url = `${environment.apiGateway}/players/${uuid}/profile`;
-      return new Observable<Opponent[]>((observer)=>{
-          this.http.get<Opponent[]>(`${url}`).pipe(
-              tap((opponents)=>{
-                  this._opponents=opponents;
-                  this._opponentObserver=observer;
-                  this._opponentObserver.next(this._opponents);
-              }
-          )).subscribe();                  
-       });
+  getOpponents$():Observable<Opponent[]>{
+    const result:Subject<Opponent[]> = new Subject<Opponent[]>();
+    const url=`${common.endpoint}/players/opponents`;
+    this.authSvc.getAccessJwtToken()
+    .then(token=>{
+        const headers= new HttpHeaders()
+        .set('Authorization', token);
+        this.http.get<Opponent[]>(url,{headers:headers}).subscribe(opponents=>{
+            result.next(opponents);
+        });
+    });
+    return result;
   }
-//   updateOpponentStatus(opponent:IPlayerModel){
-//       this._opponents.forEach((opp)=>{
-//           if(opp.uuid===opponent.uuid){
-//               opp.online=(!opp.online);
-//           }
-//           console.log(`opponent[${opp.uuid}] is online=${opp.online}`);
-//       });
-//       this._opponentObserver.next(this._opponents);
-//   }
+  
   getPlayerByName$(name:string):Observable<IPlayerModel>{
       console.log(`player.service getPlayerByName$ name:${name}`);
       let player$:Observable<IPlayerModel>;
@@ -82,7 +58,7 @@ export class PlayerService {
           this._players.forEach(p=>{
               if(p.name===name){
                   this._activePlayer=p;
-                  this.profileSvc.getProfile$(p.uuid).subscribe((profile)=>{
+                  this.profileSvc.getProfile$().subscribe((profile)=>{
                       console.log(`Loaded profile for user: ${p.name}`);
                   });
               }
@@ -90,7 +66,7 @@ export class PlayerService {
       }
       if(!this._activePlayer || this._activePlayer.name != name){
           console.log(`player.service getPlayerByName$ can't find player in cache so call the database`);
-          player$= this.http.get<any>(`${common.endpoint}players?name=${name}`).pipe(
+          player$= this.http.get<any>(`${common.endpoint}/players?name=${name}`).pipe(
               tap((player) => console.log(`data.service.getPlayer(): ${player}`)),
               catchError(common.handleError<any>('getPlayerByName'))
           );
@@ -99,24 +75,59 @@ export class PlayerService {
       }
     return player$;
   }
-  signOut(){
-      this._activePlayer=null;
-  }
   setActivePlayer(playerGuid){
       console.log(`setActivePlayer(${playerGuid})`);
       this._activePlayer=this._playersByGuid[playerGuid];
   }
-  getPlayer$(uuid:string):Observable<IPlayerModel>{
-      if(this._playersByGuid){
-          if(!this._playersByGuid[uuid]){
-              this.http.get<IPlayerModel>(`${common.endpoint}players/${uuid}`).subscribe(p=>{
-                  this._playersByGuid[uuid]=p;
-                  return of(p);
-              });
-          }else{
-              return of(this._playersByGuid[uuid]);
-          }
-      }
+  getPlayerById$(uuid):Observable<IPlayerModel>{ 
+    let url = `${common.endpoint}/players?playerUuid=${uuid}`;
+    return this._getPlayer$(uuid,url)
+  }
+  getPlayer$():Observable<IPlayerModel>{  
+    const result:Subject<IPlayerModel> = new Subject<IPlayerModel>();
+    const url=`${common.endpoint}/players`;
+    
+    this.authSvc.whoAmI()
+    .then(sub=>{
+        const uuid=sub;
+        this._getPlayer$(uuid,url).subscribe(p=>{
+            result.next(p);
+        },
+        err => {
+            console.error('getPlayer$()._getPlayer$:', JSON.stringify(err));
+        });
+    })
+    .catch(err=>{
+        console.error('getPlayer$().whoAmI:', JSON.stringify(err));
+    }); 
+    return result;
+  }
+  _getPlayer$(uuid:string,url:string):Observable<IPlayerModel>{
+    const result:Subject<IPlayerModel> = new Subject<IPlayerModel>();
+      console.log(`uuid:${uuid}\n${url}`);
+      
+    if(this._playersByGuid){
+        if(!this._playersByGuid[uuid]){
+            this.authSvc.getAccessJwtToken()
+            .then(token=>{
+                const headers= new HttpHeaders()
+                .set('Authorization', token);
+                this.http.get<IPlayerModel>(url,{headers:headers}).subscribe(p=>{
+                    this._playersByGuid[uuid]=p;
+                    result.next(p);
+                },
+                err => {
+                    console.error('_getPlayer$.http.get:', JSON.stringify(err));
+                });
+            })
+            .catch(err=>{
+                console.error('_getPlayer$.getAccessJwtToken:', JSON.stringify(err));
+            }); 
+        }else{
+            result.next(this._playersByGuid[uuid]);
+        }
+    }
+    return result;
   }
   getPlayers$(uuids:string[]=[]):Observable<IPlayerModel[]>{  
       let players=[];
@@ -124,29 +135,9 @@ export class PlayerService {
           throw new Error(`wrong number of players (${uuids.length})`);
       }
       uuids.forEach(async (guid)=>{
-          let p = await this.getPlayer$(guid).toPromise();
+          let p = await this.getPlayerById$(guid).toPromise();
           players.push(p);
       });
       return of(players);
   }
-//   getAllPlayers$():Observable<IPlayerModel[]>{ 
-//       const players$:Observable<IPlayerModel[]>=of(this._players);
-//       this._players.forEach((p)=>{
-//           this._playersByGuid[p.uuid]=p;
-//       });
-//       return players$;
-//   }
-//  async addPlayer(player:IPlayerModel):boolean{
-//      if(player.guid && player.guid.length >0){
-//          return this.updatePlayer(player);
-//      }
-//      await this._http.post<any>(`${common.endpoint}/players`,player).toPromise;
-//      return true;
-//  }
-//  updatePlayer(player:IPlayerModel):boolean{
-//      return true;
-//  }
-//  removePlayer(player:IPlayerModel){
-//      
-//  }
 }
