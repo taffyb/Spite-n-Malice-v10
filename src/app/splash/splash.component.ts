@@ -9,7 +9,7 @@ import {PlayerService} from '../services/player.service';
 import {ProfileService} from '../services/profile.service';
 import {GameService} from '../services/game.service';
 import {AuthService} from '../services/auth.service';
-import {MyAuthTypesEnum} from '../classes/auth.enums';
+import {AuthTypesEnum} from '../classes/auth.enums';
 import { Auth } from 'aws-amplify';
 
 @Component({
@@ -37,19 +37,19 @@ export class SplashComponent implements OnInit {
 
     Auth.currentAuthenticatedUser()
     .then(user =>{ 
-        this.myAuthSvc.setAuthStatus(MyAuthTypesEnum.AUTHENTICATED);
+        this.myAuthSvc.setAuthStatus(AuthTypesEnum.AUTHENTICATED);
         this.playerSvc.setActivePlayer(user.username);
         this.router.navigate([`/home`]);
     })
     .catch(err => {
       console.log(err);
-      this.myAuthSvc.setAuthStatus(MyAuthTypesEnum.UNAUTHENTICATED);
+      this.myAuthSvc.setAuthStatus(AuthTypesEnum.UNAUTHENTICATED);
       this.router.navigate([`/login`]);
     });
               
   }
   async guestEntry(){
-    this.myAuthSvc.setAuthStatus(MyAuthTypesEnum.GUEST);
+    this.myAuthSvc.setAuthStatus(AuthTypesEnum.GUEST);
     const player = await this.playerSvc.getPlayerByName$("Player1").toPromise();
     const profile$:Observable<IProfileModel> = this.profileSvc.getDefaultProfile$();
     const game:IGameModel = this.gameSvc.newGame("game",player.uuid,"222222",true); 

@@ -8,7 +8,7 @@ import {IGameModel} from '../classes/games';
 import {IPlayerModel, IInvitationMessage} from 's-n-m-lib';
 import { Auth } from 'aws-amplify';
 import { AuthService } from '../services/auth.service';
-import { MyAuthTypesEnum } from '../classes/auth.enums';
+import { AuthTypesEnum } from '../classes/auth.enums';
 
 
 @Component({
@@ -42,6 +42,7 @@ export class HomeComponent implements OnInit {
       console.log(`HomeComponent.currentAuthenticatedUser: ${user.username}`);
       
       this.playerSvc.getPlayer$().subscribe(player=>{
+        this.playerSvc.setActivePlayer(player.uuid);
         console.log(`HomeComponent.getPlayer$: ${JSON.stringify(player,null,2)}`);
         this.profileSvc.getProfile$().subscribe({
           next:(profile)=>{console.log(`Load Profile for ${player.uuid}: ${JSON.stringify(profile)}`)},
@@ -49,7 +50,7 @@ export class HomeComponent implements OnInit {
         });
         this.games$= this.gameSvc.getGames$(3);
         // this.opponents$=this.playerSvc.getOpponents$(this.player.uuid);
-        if(this.authSvc.getAuthStatus()==MyAuthTypesEnum.AUTHENTICATED){
+        if(this.authSvc.getAuthStatus()==AuthTypesEnum.AUTHENTICATED){
           this.wsSvc.connect();
         }
       });

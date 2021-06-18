@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {MyAuthTypesEnum} from '../classes/auth.enums';
+import {AuthTypesEnum} from '../classes/auth.enums';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import {Auth} from 'aws-amplify';
 import * as common from './service.common';
@@ -9,15 +9,15 @@ import {HttpClient,HttpHeaders} from "@angular/common/http";
   providedIn: 'root'
 })
 export class AuthService {
-    private _authStatus: MyAuthTypesEnum = MyAuthTypesEnum.UNAUTHENTICATED;
+    private _authStatus: AuthTypesEnum = AuthTypesEnum.UNAUTHENTICATED;
     
     constructor(private http:HttpClient){
     }
 
-    setAuthStatus(status:MyAuthTypesEnum){
+    setAuthStatus(status:AuthTypesEnum){
         this._authStatus=status;
     }
-    getAuthStatus():MyAuthTypesEnum{
+    getAuthStatus():AuthTypesEnum{
         return this._authStatus;
     }
 
@@ -32,7 +32,7 @@ export class AuthService {
     }
 
     public async whoAmI():Promise<string>{
-        if(this.getAuthStatus()==MyAuthTypesEnum.AUTHENTICATED){
+        if(this.getAuthStatus()==AuthTypesEnum.AUTHENTICATED){
             return new Promise<string>((resolve,reject) => {
                 const url = `${common.endpoint}/whoami`;
                 this.getAccessJwtToken()

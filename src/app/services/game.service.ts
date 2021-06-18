@@ -8,7 +8,7 @@ import {AuthService} from './auth.service';
 import * as common from './service.common';
 import {Observable, of, Subject} from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { MyAuthTypesEnum } from "../classes/auth.enums";
+import { AuthTypesEnum } from "../classes/auth.enums";
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +25,7 @@ export class GameService{
     getGame$(gameUuid:string):Observable<Game>{
         const result:Subject<Game> = new Subject<Game>();
         console.log(`getGame$: ${gameUuid}`);
-        if(this.authSvc.getAuthStatus()==MyAuthTypesEnum.AUTHENTICATED){
+        if(this.authSvc.getAuthStatus()==AuthTypesEnum.AUTHENTICATED){
             return new Observable<Game>(subscriber => {
                 if(!this._games[gameUuid]){   
                     const url = `${common.endpoint}/games/${gameUuid}`;

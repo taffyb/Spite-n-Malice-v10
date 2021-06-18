@@ -12,7 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import {User} from './classes/user.model';
 
 import {Router, NavigationStart } from '@angular/router';
-import { MyAuthTypesEnum } from './classes/auth.enums';
+import { AuthTypesEnum } from './classes/auth.enums';
 import { AuthGuardService } from './services/auth-guard.service';
 
 @Component({
@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
     authState: AuthState;
     selectedTab:number=0;
     selectedTabName:string="welcome";
-    authStates=MyAuthTypesEnum;
+    authStates=AuthTypesEnum;
 
     constructor(
             private router: Router,
@@ -78,7 +78,7 @@ export class AppComponent implements OnInit {
         if(this.authState==AuthState.SignedIn){
             
             // this.playerSvc.setActivePlayer(this.user.username);
-            this.authSvc.setAuthStatus(MyAuthTypesEnum.AUTHENTICATED);
+            this.authSvc.setAuthStatus(AuthTypesEnum.AUTHENTICATED);
             this.router.navigate(['/home']);
 
         }

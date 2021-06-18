@@ -9,7 +9,7 @@ import {Location, TimeZone} from '../classes/timezones'
 import {environment} from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { CognitoUserSession, CognitoIdToken } from 'amazon-cognito-identity-js'
-import { MyAuthTypesEnum } from '../classes/auth.enums';
+import { AuthTypesEnum } from '../classes/auth.enums';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +29,7 @@ export class ProfileService {
   getProfile$():Observable<IProfileModel>{  
     console.log(`getProfile$`);  
     const result:Subject<IProfileModel> = new Subject<IProfileModel>();
-    if(this.authSvc.getAuthStatus()==MyAuthTypesEnum.AUTHENTICATED){
+    if(this.authSvc.getAuthStatus()==AuthTypesEnum.AUTHENTICATED){
       const url = `${environment.apiGateway}/players/profile`;
       this.authSvc.getAccessJwtToken()
       .then(token=>{

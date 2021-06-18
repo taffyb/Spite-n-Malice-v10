@@ -19,7 +19,6 @@ export class GameItemComponent implements OnInit {
   }
 
   isMyTurn():boolean{
-      let isMyTurn:boolean=false;
       const me:IPlayerModel = this.playerSvc.getActivePlayer();
       const playersUuids:string[] = [this.game.player1Uuid,this.game.player2Uuid];
       

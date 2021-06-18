@@ -1,5 +1,5 @@
 
-export enum MyAuthTypesEnum{
+export enum AuthTypesEnum{
     UNAUTHENTICATED,
     AUTHENTICATED,
     GUEST

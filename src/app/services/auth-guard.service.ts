@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { AuthService} from './auth.service';
-import {MyAuthTypesEnum} from '../classes/auth.enums';
+import {AuthTypesEnum} from '../classes/auth.enums';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +17,7 @@ export class AuthGuardService implements CanActivate {
     return this.isVisible(next.url[0].toString());
   }
   isVisible(target:string):boolean{
-      const authStatus:MyAuthTypesEnum = this.authSvc.getAuthStatus();
+      const authStatus:AuthTypesEnum = this.authSvc.getAuthStatus();
       let visible=false;
       target=target.split('/')[0];
       switch(target){
@@ -25,16 +25,16 @@ export class AuthGuardService implements CanActivate {
           visible=true;
           break;
           case 'burger':
-            visible=(authStatus!=MyAuthTypesEnum.UNAUTHENTICATED);
+            visible=(authStatus!=AuthTypesEnum.UNAUTHENTICATED);
             break;
           case 'welcome':
-              visible=(authStatus!=MyAuthTypesEnum.AUTHENTICATED);
+              visible=(authStatus!=AuthTypesEnum.AUTHENTICATED);
               break;
           case 'home':
-              visible=(authStatus==MyAuthTypesEnum.AUTHENTICATED);
+              visible=(authStatus==AuthTypesEnum.AUTHENTICATED);
               break;
           case 'play-area':
-            visible=(authStatus!=MyAuthTypesEnum.UNAUTHENTICATED);
+            visible=(authStatus!=AuthTypesEnum.UNAUTHENTICATED);
               break;
       }
       // console.log(`${MyAuthTypesEnum[authStatus]} auth-guard.isVisible target:${target} visible:${visible}`);
