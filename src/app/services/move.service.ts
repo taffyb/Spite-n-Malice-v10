@@ -65,8 +65,8 @@ export class MoveService{
         }
     }
     saveMoves(gameUuid: string,ms: IMoveModel[]){
-        // ms.forEach((move)=>{   
-            this.http.put<IMoveModel>(`${common.endpoint}/games/${gameUuid}/moves`,ms).subscribe(
+        const url =  `${common.endpoint}/games/${gameUuid}/moves`;
+            this.http.put<IMoveModel>(url,ms).subscribe(
                 (val) => {
                     console.log(`POST call successful value returned in body ${JSON.stringify(val)}`);
                 },

@@ -65,11 +65,12 @@ export class PlayAreaComponent implements OnInit {
               private profileSvc:ProfileService, 
               private renderer:Renderer2,
               private wsSvc:WsService) { 
-      console.log(`PlayAreaComponent: constructor`);
+    //   console.log(`PlayAreaComponent: constructor`);
       this.uiGame$=this.gameSvc.game$;
   }
 
   ngOnInit() {
+    console.log(`***** ngOnInit`);
     this.route.params.subscribe((val) => {
         const gameUuid = val.gameUuid;
         this.activeGameUuid = gameUuid;
@@ -77,19 +78,16 @@ export class PlayAreaComponent implements OnInit {
         
         if(gameUuid){
             try{
-                this.uiGame$ = this.gameSvc.game$;
+                const uiGame$ = this.gameSvc.game$;
 
-                this.uiGame$.subscribe({
+                uiGame$.subscribe({
                     next: async (game:Game)=>{
                         this.game=game;
-                        // console.log(`play-area.component: ${JSON.stringify(game)}`);
+
                         const playerUuids = [game.player1Uuid,game.player2Uuid];
-                        // console.log(`Load game players: ${JSON.stringify(playerUuids)}`);
                         const players = this.playerSvc.getPlayers(playerUuids);
                         this.players=players;
-                        // console.log(`this.players ${JSON.stringify(this.players)}`);
-                        
-                        // console.log(`*****\ngame loaded [${game.uuid}]\nplayers loaded  ${this.players.length}\n*****`);
+
                         this.game.onStateChange$().subscribe({
                             next:(gameState)=>{
                                 this.gameSvc.updateGameState(game.toModel());
@@ -123,15 +121,10 @@ export class PlayAreaComponent implements OnInit {
                 console.error(`catch block ${err} ${JSON.stringify(err)}`);
                 this.router.navigate(['/']);
             }
-            // console.log(`***** initialise play-area [${this.game.uuid}]`);
-            // this.uiGame$.subscribe({next:(g)=>{
-            //     console.log(`uiGame: ${JSON.stringify(g)}`);
-            // }});   
         }
     });
 
     this.moveSvc.moves$.subscribe((ms)=>{
-        // console.log(`moveSvc subscription [${ms.gameUuid}] [${ms.moves.length}] `);
         if(ms.gameUuid==this.activeGameUuid){
             this.performMoves(ms.gameUuid,ms.moves);
         }

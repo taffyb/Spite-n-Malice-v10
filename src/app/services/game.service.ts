@@ -22,7 +22,6 @@ export class GameService{
                 private dealerSvc:DealerService, 
                 private playerSvc:PlayerService, 
                 private authSvc:AuthService){
-        // console.log(`GameService.constructor`);
     }
 
     getGameCards$(gameUuid:string):Observable<number[][]>{
@@ -95,10 +94,8 @@ export class GameService{
             }      
         }else{
             console.log(`UNAUTHENTICATED getGame$ get from cache [${gameUuid}]`);
-            console.log(`_games: ${JSON.stringify(this._games)}`);
             const game:Game=this._games[gameUuid];
             this.game$.next(game);
-            // this.game$.complete();
         }
     }
     getGames$(limit?:number):Observable<IGameModel[]>{
@@ -121,12 +118,8 @@ export class GameService{
         const deck:number[] = this.dealerSvc.getDeck();
         const g:IGameModel=GameFactory.newGame(name,player1Uuid, player2Uuid,deck,local);
         const game:Game=Game.fromModel(g);
-        const playerUuids = [game.player1Uuid,game.player2Uuid];
-        console.log(`game.service.newGame: ${JSON.stringify(playerUuids)}`);
-        // const players = this.playerSvc.getPlayers(playerUuids);
-        // game.players = players
         this._games[game.uuid]=game;
-        
+        this.statusChanged.next({status:GameStatesEnum.NEW,game:game});
         return game;
     }
     saveGame(game:IGameModel){

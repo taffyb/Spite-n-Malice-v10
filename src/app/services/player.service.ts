@@ -137,20 +137,15 @@ export class PlayerService {
     return result$;
   }
   getPlayers(uuids:string[]=[]):IPlayerModel[]{
-    // const result$:Subject<IPlayerModel[]> = new Subject<IPlayerModel[]>();
       let players:IPlayerModel[]=[];
-      
       
       if(uuids.length !=2){
           throw new Error(`wrong number of players (${uuids.length})`);
       }
       uuids.forEach(async (uuid,i)=>{
-        const p = {uuid:uuid,name:"player "+i};
-        // const p = await this.getPlayerById$(uuid).toPromise();
-        console.log(`getPlayers [${i}]: ${JSON.stringify(p)} `);
+        const p = this._playersByGuid[uuid];
         players.push(p);
       });
-    //   console.log(`getPlayers players: ${JSON.stringify(players)} `);
       return players;
   }
 }

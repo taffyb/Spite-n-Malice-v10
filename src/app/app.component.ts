@@ -108,6 +108,8 @@ export class AppComponent implements OnInit {
     }
     isVisible(targetUrl:string):boolean{
         let isVisible:boolean = this.authGuardSvc.isVisible(targetUrl);
+        
+    //    console.log(`AppComponent.isVisible targetUrl:${targetUrl} isVisible:${isVisible}`);
         return isVisible;
     }
 
