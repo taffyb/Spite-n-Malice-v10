@@ -1,6 +1,6 @@
 import { Component, OnInit, Input,ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import {AngularPageVisibilityStateEnum, AngularPageVisibilityService} from 'angular-page-visibility';
-import {Observable,Subject} from 'rxjs';
+import {Observable,of,Subject} from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import {ActivatedRoute, Router, NavigationStart, NavigationEnd } from '@angular/router';
 
@@ -30,14 +30,15 @@ export class PlayAreaComponent implements OnInit {
   cE=CardsEnum;
   mtE=MoveTypesEnum;
 
-  players$:Observable<IPlayerModel[]>;
   profile:IProfileModel;
   game:Game;
+  uiGame$:Observable<Game>;
   from:SelectedCard=new SelectedCard(-1,-1);
   to:SelectedCard=new SelectedCard(-1,-1);
   moves:IMoveModel[]=[];
   message="";
   players:IPlayerModel[];
+  players$:Observable<IPlayerModel[]>;
   pageVisible:boolean=true;
   
   //animation control
@@ -65,50 +66,69 @@ export class PlayAreaComponent implements OnInit {
               private renderer:Renderer2,
               private wsSvc:WsService) { 
       console.log(`PlayAreaComponent: constructor`);
+      this.uiGame$=this.gameSvc.game$;
   }
 
   ngOnInit() {
-    this.route.params.subscribe(async (val) => {
+    this.route.params.subscribe((val) => {
         const gameUuid = val.gameUuid;
         this.activeGameUuid = gameUuid;
-        console.log(`***** route change [${this.activeGameUuid}] subscribed:${this.$onMoves?true:false}`);
+        console.log(`***** route change [${this.activeGameUuid}/${gameUuid}] subscribed:${this.$onMoves?true:false}`);
+        
         if(gameUuid){
             try{
-                this.game = await this.gameSvc.getGame$(gameUuid).toPromise(); 
-                // console.log(`player1Uuid:${this.game.player1Uuid}, player2Uuid:${this.game.player2Uuid}`);
-                this.players$=this.playerSvc.getPlayers$([this.game.player1Uuid,this.game.player2Uuid]).pipe(
-                    tap((players)=>{
+                this.uiGame$ = this.gameSvc.game$;
+
+                this.uiGame$.subscribe({
+                    next: async (game:Game)=>{
+                        this.game=game;
+                        // console.log(`play-area.component: ${JSON.stringify(game)}`);
+                        const playerUuids = [game.player1Uuid,game.player2Uuid];
+                        // console.log(`Load game players: ${JSON.stringify(playerUuids)}`);
+                        const players = this.playerSvc.getPlayers(playerUuids);
                         this.players=players;
-                    })
-                );
-                this.profile = this.profileSvc.getActiveProfile(); 
-                this.game.onStateChange$().subscribe({
-                    next:async (gameState)=>{
-                        this.gameSvc.updateGameState(this.game.toModel());
-                        switch(gameState){
-                        case GameStatesEnum.GAME_OVER:
-                            let players  = await this.playerSvc.getPlayers$([this.game.player1Uuid,this.game.player2Uuid]).toPromise();
-                            this.message = `Congratulations ${players[this.game.activePlayer].name} you are the Winner.`;
-                            break;
-                        case GameStatesEnum.DRAW:
-                            this.message = `There are no cards left. We will have to call this a draw.`;
-                            break;
-                        }},
-                    error:(err)=>{
-                        console.error(`Error onStateChange ${JSON.stringify(err)}`);
+                        // console.log(`this.players ${JSON.stringify(this.players)}`);
+                        
+                        // console.log(`*****\ngame loaded [${game.uuid}]\nplayers loaded  ${this.players.length}\n*****`);
+                        this.game.onStateChange$().subscribe({
+                            next:(gameState)=>{
+                                this.gameSvc.updateGameState(game.toModel());
+                                switch(gameState){
+                                case GameStatesEnum.GAME_OVER:
+                                    this.message = `Congratulations ${this.players[this.game.activePlayer].name} you are the Winner.`;
+                                    break;
+                                case GameStatesEnum.DRAW:
+                                    this.message = `There are no cards left. We will have to call this a draw.`;
+                                    break;
+                                }
+                            },
+                            error:(err)=>{
+                                console.error(`Error onStateChange ${JSON.stringify(err)}`);
+                            },
+                            complete:()=>{}
+                        });
+                       const activePlayer:IPlayerModel= this.playerSvc.getActivePlayer();
+                        // console.log(`***** initialise play-area [${game.uuid}]`);
+                       this.game= game;
+                       this.uiGame$=of(game);
                     },
-                    complete:()=>{}
-                });
-                const activePlayer:IPlayerModel= this.playerSvc.getActivePlayer();
-//                  wsSvc.joinGame(activePlayer.uuid,this.game.uuid);
+                    error:err=>{
+                        console.error(`Error games$ ${JSON.stringify(err)}`);
+                    }
+                });   
+                this.gameSvc.getGame(gameUuid);
+                this.profile = this.profileSvc.getActiveProfile(); 
 
             }catch(err){
                 console.error(`catch block ${err} ${JSON.stringify(err)}`);
                 this.router.navigate(['/']);
             }
+            // console.log(`***** initialise play-area [${this.game.uuid}]`);
+            // this.uiGame$.subscribe({next:(g)=>{
+            //     console.log(`uiGame: ${JSON.stringify(g)}`);
+            // }});   
         }
     });
-    console.log(`***** initialise play-area [${this.activeGameUuid}]`);
 
     this.moveSvc.moves$.subscribe((ms)=>{
         // console.log(`moveSvc subscription [${ms.gameUuid}] [${ms.moves.length}] `);
@@ -302,8 +322,8 @@ export class PlayAreaComponent implements OnInit {
               move.to=this.to.position;
               move.type = MoveTypesEnum.PLAYER;
               move.isDiscard=this.isDiscard(this.to.position);
-              const players = await this.players$.toPromise();
-              this.moveSvc.addMove(this.game,players[this.game.activePlayer].uuid, move);
+            //   const players = await this.players$.toPromise();
+              this.moveSvc.addMove(this.game,this.players[this.game.activePlayer].uuid, move);
               
               //reset selected Positions
               this.from = new SelectedCard(-1,-1);
@@ -320,6 +340,8 @@ export class PlayAreaComponent implements OnInit {
           isActivePlayerSelectable=true;
       }else{
           const activePlayer = this.playerSvc.getActivePlayer();
+          console.log(`Players:${JSON.stringify(this.players,null,2)}`);
+          
           isActivePlayerSelectable= (this.players[this.game.activePlayer].uuid===activePlayer.uuid);
       }
   
@@ -443,12 +465,18 @@ export class PlayAreaComponent implements OnInit {
       return {top:clientRect.top,left:clientRect.left};
   }
   playAgain(){
-      const g:Game = this.gameSvc.newGame("game", this.game.player1Uuid, this.game.player2Uuid,this.game.local);
+      const g= this.gameSvc.newGame("game", this.game.player1Uuid, this.game.player2Uuid,this.game.local);
+    
+    // g$.subscribe({
+    //   next:g=>{
+        const url:string = `/play-area/${g.uuid}`;
+        this.router.navigate([url]);
+//       },
+//       error:err=>{
+//         console.error('error creating new game:', JSON.stringify(err));
+//       }
+//   });
       this.message="";
-      this.game = g;
-      const url:string = `/play-area/${g.uuid}`;
-      console.log(`route to new game: ${url}`);
-      this.router.navigate([url]);
   }
   isActivePlayer(pIdx:number):boolean{
       let isActivePlayer:boolean=false;

@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import {Observable,Subject, of} from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 
-import * as common from './service.common';
 import {IProfileModel,DEFAULT_PROFILE,IPlayerModel} from 's-n-m-lib';
 import {Location, TimeZone} from '../classes/timezones'
 import {environment} from '../../environments/environment';
@@ -35,12 +34,15 @@ export class ProfileService {
       .then(token=>{
         const headers= new HttpHeaders()
             .set('Authorization', token);
-          this.http.get<any>(url,{'headers':headers}).pipe(tap(profile=>{this._profile=profile;})).subscribe(
+          this.http.get<IProfileModel>(url,{'headers':headers}).subscribe(
             (profile)=>{
+              this._profile=profile;
               console.log(`RESPONSE: ${JSON.stringify(profile)}`);            
               result.next(profile);
-            }
-          );
+            }),
+            (err)=>{
+              console.error(`ERROR: ${JSON.stringify(err)}`);  
+            };
         });
       return result;
     }else{

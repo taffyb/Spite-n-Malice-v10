@@ -49,10 +49,22 @@ export class SplashComponent implements OnInit {
               
   }
   async guestEntry(){
+    console.log('GUEST ENTRY');
     this.myAuthSvc.setAuthStatus(AuthTypesEnum.GUEST);
     const player = await this.playerSvc.getPlayerByName$("Player1").toPromise();
-    const profile$:Observable<IProfileModel> = this.profileSvc.getDefaultProfile$();
-    const game:IGameModel = this.gameSvc.newGame("game",player.uuid,"222222",true); 
+    // const profile$:Observable<IProfileModel> = this.profileSvc.getDefaultProfile$();
+    const game= this.gameSvc.newGame("game",player.uuid,"222222",true);
+    
+    // g$.subscribe({
+    //     next:g=>{
+    //       console.log('splash.component.g$.next:');
+    //       const url:string = `/play-area/${g.uuid}`;
+    //       this.router.navigate([url]);
+    //     },
+    //     error:err=>{
+    //       console.error('error creating new game:', JSON.stringify(err));
+    //     }
+    // });
     this.router.navigate([`/play-area/${game.uuid}`]);
   }
 

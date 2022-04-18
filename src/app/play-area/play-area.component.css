@@ -9,12 +9,6 @@
 	top:48px;
 	right:0;
 }
-.player{
-	display:inline-flex;
-	padding-bottom:15px;
-	padding-right:30px;
-	min-height: 260px;
-}
 .container{
 	display:flex;
 	flex-flow:column;
@@ -30,6 +24,12 @@
 }
 .heading.inactive{
 	background:#a31217;
+}
+.player{
+	display:inline-flex;
+	padding-bottom:15px;
+	padding-right:30px;
+	min-height: 260px;
 }
 .player-pile{
   	border-right:solid grey 5px;

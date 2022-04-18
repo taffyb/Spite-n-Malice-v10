@@ -5,89 +5,142 @@ import {IGameModel, GameFactory, Game} from '../classes/games';
 import {Card, ICardModel, GameStatesEnum} from 's-n-m-lib';
 import {DealerService} from './dealer.service';
 import {AuthService} from './auth.service';
-import * as common from './service.common';
+import {environment} from '../../environments/environment';
 import {Observable, of, Subject} from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuthTypesEnum } from "../classes/auth.enums";
+import { PlayerService } from "./player.service";
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameService{
+    public game$:Subject<Game> = new Subject<Game>();
     private _games={};
     statusChanged: Subject<{status:GameStatesEnum, game: IGameModel}> = new Subject<{status:GameStatesEnum, game: IGameModel}>();
     constructor(private http:HttpClient, 
                 private dealerSvc:DealerService, 
+                private playerSvc:PlayerService, 
                 private authSvc:AuthService){
         // console.log(`GameService.constructor`);
     }
 
-    getGame$(gameUuid:string):Observable<Game>{
-        const result:Subject<Game> = new Subject<Game>();
+    getGameCards$(gameUuid:string):Observable<number[][]>{
+        const result:Subject<number[][]> = new Subject<number[][]>();
+        
+        if(this.authSvc.getAuthStatus()==AuthTypesEnum.AUTHENTICATED){
+            const url = `${environment.apiGateway}/games/${gameUuid}?cards=true`;
+            this.authSvc.getAccessJwtToken()
+            .then(token=>{
+                // console.log(`token:\n${token}`);
+                const headers= new HttpHeaders().set('Authorization', token);
+                const http$ = this.http.get<number[][]>(url,{headers:headers});
+                http$.subscribe(cards=>{
+                    result.next(cards);
+                    result.complete();
+                })
+            });
+        }
+        return result;
+    }
+    getGame(gameUuid:string):void{
         console.log(`getGame$: ${gameUuid}`);
         if(this.authSvc.getAuthStatus()==AuthTypesEnum.AUTHENTICATED){
-            return new Observable<Game>(subscriber => {
-                if(!this._games[gameUuid]){   
-                    const url = `${common.endpoint}/games/${gameUuid}`;
-                    this.authSvc.getAccessJwtToken()
-                    .then(token=>{
-                        console.log(`token:\n${token}`);
-                        const headers= new HttpHeaders().set('Authorization', token);
-                        const http$ = this.http.get<Game>(url,{headers:headers});
-                        http$.subscribe(g=>{
-                            const game:Game = Game.fromModel(this.game2UiGame(Game.fromModel(g)));
+            if(!this._games[gameUuid]){   
+                const url = `${environment.apiGateway}/games/${gameUuid}`;
+                this.authSvc.getAccessJwtToken()
+                .then(token=>{
+                    console.log(`token:\n${token}`);
+                    const headers= new HttpHeaders().set('Authorization', token);
+                    const http$ = this.http.get<any>(url,{headers:headers});
+                    http$.subscribe(g=>{
+                        const game:Game = Game.fromModel(g);
+                        
+                        this.getGameCards$(gameUuid).subscribe(cards=>{
+                            console.log(`AUTHENTICATED getGameCards$ from DB`);
                             this._games[gameUuid]=game;
-                            this.statusChanged.next({status: GameStatesEnum.NEW, game: game});
-                            result.next(game);
-                            result.complete();
-                        })
-                      });
+                            game.cards = this.numericCards2UiCards(cards);
+                            this.game$.next(game);
+                            this.game$.complete();
+                        },
+                        (err)=>{
+                            console.error(`Error retrieving Cards for: ${gameUuid}\n${JSON.stringify(err)}`);
+                            
+                        });
+                    },
+                    (err)=>{console.error(`http$.subscribe:${JSON.stringify(err)}`);
+                    })
+                })
+                .catch((err)=>{
+                    console.error(`http$.getAccessJwtToken:${JSON.stringify(err)}`);
+                });
+            }else{
+                console.log(`AUTHENTICATED getGame$ get from cache`);
+                const game:Game=this._games[gameUuid];
+                console.log(`game.cards ${game.cards?game.cards.length:'MISSING'}`);
+                if(!game.cards){
+                    this.getGameCards$(gameUuid).subscribe( async cards=>{
+                        game.cards = this.numericCards2UiCards(cards);
+                        this.game$.next(game);
+                        this.game$.complete();
+                    },
+                    (err)=>{
+                        console.error(`Error retrieving Cards for: ${gameUuid}\n${JSON.stringify(err)}`);
+                        
+                    });
                 }else{
-                    console.log(`getGame$ get from cache`);
-                    result.next(this._games[gameUuid]);
-                    result.complete();
-                }           
-            });
+                    this.game$.next(game);
+                    this.game$.complete();
+                }
+            }      
         }else{
-            console.log(`getGame$ get from cache`);
-            return of(this._games[gameUuid]);
+            console.log(`UNAUTHENTICATED getGame$ get from cache [${gameUuid}]`);
+            console.log(`_games: ${JSON.stringify(this._games)}`);
+            const game:Game=this._games[gameUuid];
+            this.game$.next(game);
+            // this.game$.complete();
         }
     }
     getGames$(limit?:number):Observable<IGameModel[]>{
         const result:Subject<IGameModel[]> = new Subject<IGameModel[]>();
-        const url = `${common.endpoint}/players/games`;
+        const url = `${environment.apiGateway}/players/games`;
         console.log(`getGames$: ${url}`);
         this.authSvc.getAccessJwtToken()
         .then(token=>{
-            console.log(`token:\n${token}`);
+            // console.log(`token:\n${token}`);
             const headers= new HttpHeaders().set('Authorization', token);
             const http$ = this.http.get<IGameModel[]>(url,{headers:headers});
-            http$.pipe(
-                // tap((games)=>{
-                //     console.log(`games ${JSON.stringify(games,null,2)}`);                    
-                // })
-                
-            ).subscribe(res=>{result.next(res)});
+            http$.subscribe(res=>{
+                result.next(res);
+            });
         });
         return result;
     }
     newGame(name:string,player1Uuid:string,player2Uuid:string,local:boolean):Game{
+        // const result$:Subject<Game> = new Subject<Game>();
         const deck:number[] = this.dealerSvc.getDeck();
         const g:IGameModel=GameFactory.newGame(name,player1Uuid, player2Uuid,deck,local);
         const game:Game=Game.fromModel(g);
+        const playerUuids = [game.player1Uuid,game.player2Uuid];
+        console.log(`game.service.newGame: ${JSON.stringify(playerUuids)}`);
+        // const players = this.playerSvc.getPlayers(playerUuids);
+        // game.players = players
         this._games[game.uuid]=game;
-        this.statusChanged.next({status: GameStatesEnum.NEW, game: game});
-        this.saveGame(game);
+        
         return game;
     }
     saveGame(game:IGameModel){
         console.log(`saveGame [${game.uuid}]`);
-        this.http.post<IGameModel>(`${common.endpoint}/games`,this.uiGame2Game(game)).subscribe();
+        let g:any =JSON.parse(JSON.stringify(game));
+        g.cards =this.uiCards2NumericCards(game.cards);
+        this.http.post<IGameModel>(`${environment.apiGateway}/games`,g).subscribe();
     }
     updateGame(game:IGameModel){
         
         game.updateDateTime=""+Date.now();
-        this.http.put<boolean>(`${common.endpoint}/games/${game.uuid}?activePlayer=true`,this.uiGame2Game(game)).subscribe(
+        let g:any =JSON.parse(JSON.stringify(game));
+        g.cards =this.uiCards2NumericCards(game.cards);
+        this.http.put<boolean>(`${environment.apiGateway}/games/${game.uuid}?activePlayer=true`,g).subscribe(
                 (val) => {
                     console.log(`updateGame Success`);
                 },
@@ -98,7 +151,9 @@ export class GameService{
     updateGameName(game:IGameModel){
         
         game.updateDateTime=""+Date.now();
-        this.http.put<boolean>(`${common.endpoint}/games/${game.uuid}?name=true`,this.uiGame2Game(game)).subscribe(
+        let g:any =JSON.parse(JSON.stringify(game));
+        g.cards =this.uiCards2NumericCards(game.cards);
+        this.http.put<boolean>(`${environment.apiGateway}/games/${game.uuid}?name=true`,g).subscribe(
                 (val) => {
                     console.log(`updateName Success`);
                 },
@@ -109,7 +164,9 @@ export class GameService{
     updateGameState(game:IGameModel){
         
         game.updateDateTime=""+Date.now();
-        this.http.put<boolean>(`${common.endpoint}/games/${game.uuid}?state=true`,this.uiGame2Game(game)).subscribe(
+        let g:any =JSON.parse(JSON.stringify(game));
+        g.cards =this.uiCards2NumericCards(game.cards);
+        this.http.put<boolean>(`${environment.apiGateway}/games/${game.uuid}?state=true`,g).subscribe(
                 (val) => {
                     console.log(`updateState[${GameStatesEnum[game.state]}] Success`);
                 },
@@ -120,41 +177,32 @@ export class GameService{
     setGame(gameUuid:string,cards:ICardModel[][]){
         this._games[gameUuid].cards=cards;
     }
-
-    private game2UiGame(game):IGameModel{
-        const cards:ICardModel[][]=[];
-        const g:IGameModel = Game.fromModel(game);
-        game.cards.forEach((a,i)=>{
-            cards.push([]);
+    private numericCards2UiCards(cards:number[][]):ICardModel[][]{
+        const uiCards:ICardModel[][]=[];
+        cards.forEach((a,i)=>{
+            uiCards.push([]);
             a.forEach(c=>{
-                cards[i].push(new Card(c,i));
+                uiCards[i].push(new Card(c,i));
             });
         });
-        g.cards= cards;
-        return g;
+        return uiCards;
     }
-
-    private uiGame2Game(game:IGameModel):any{
-        const g={};
-        const cards:number[][]=[];
-
-        game.cards.forEach((a,i)=>{
+    private uiCards2NumericCards(uiCards:ICardModel[][]):number[][]{
+        // const g={};
+        let cards:number[][]=[];
+        // console.log(`uiCards2NumericCards: ${JSON.stringify(uiCards)}`);
+        
+        uiCards.forEach((a,i)=>{
             cards.push([]);
             a.forEach(c=>{
-                cards[i].push(c.cardNo);
-
+                if(typeof c != 'number' ){
+                    cards[i].push(c.cardNo);
+                }else{
+                    cards[i].push(c);
+                }
             });
         });
-        g['name'] = game.name;
-        g['uuid'] = game.uuid;
-        g['state'] = game.state;
-        g['createDateTime'] = game.createDateTime;
-        g['player1Uuid'] = game.player1Uuid;
-        g['player2Uuid'] = game.player2Uuid;
-        g['activePlayer'] = game.activePlayer;
-        g['cards'] = cards;
-        g['local'] = game.local;
 
-        return g;
+        return cards;
     }
 }

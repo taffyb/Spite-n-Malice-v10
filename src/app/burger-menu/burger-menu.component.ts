@@ -19,6 +19,7 @@ import { Game } from '../classes/games';
 export class BurgerMenuComponent implements OnInit {
   @Input()player:IPlayerModel;
   profile;
+  game$;
   debugging:boolean = ('debugging' in environment);
     
   constructor(
@@ -29,6 +30,7 @@ export class BurgerMenuComponent implements OnInit {
     private playerSvc:PlayerService) { }
 
   ngOnInit() {
+    this.game$=this.gameSvc.game$;
   }
 
   onSettings(){
@@ -60,7 +62,7 @@ export class BurgerMenuComponent implements OnInit {
   }
   onShowCards(){
     let gameUuid = prompt("Enter GameUUID");
-    this.gameSvc.getGame$(gameUuid).subscribe({
+    this.game$().subscribe({
       next:(game)=>{
         let out:string="["
         for(let pos:number=PositionsEnum.PLAYER_PILE;pos<=PositionsEnum.RECYCLE;pos++){
@@ -81,16 +83,18 @@ export class BurgerMenuComponent implements OnInit {
       },
       error:(err)=>{console.error(`${err}`)}
     });
+    this.gameSvc.getGame(gameUuid);
   }
   onShowGame(){
     let gameUuid = prompt("Enter GameUUID");
-    this.gameSvc.getGame$(gameUuid).subscribe({
+    this.game$.subscribe({
       next:(game:Game)=>{
         const g:IGameModel = game.toModel();
         console.log(`${JSON.stringify(g,null,2)}`);
       },
       error:(err)=>{console.error(`${err}`)}
     });
+    this.gameSvc.getGame(gameUuid);
   }
   onSetCards(){
     const gameUUID:string = prompt("enter Game UUID");

@@ -1,13 +1,14 @@
 import {EventEmitter} from '@angular/core';
 import {Observable, Subscriber} from 'rxjs';
 
-import {SMUtils, ICardModel,IGameModel, IMoveModel, GameFactory as libGameFactory, Game as libGame} from 's-n-m-lib';
+import {SMUtils, ICardModel,IGameModel, IMoveModel, GameFactory as libGameFactory, Game as libGame, IPlayerModel} from 's-n-m-lib';
 import {MoveTypesEnum , GameStatesEnum, PositionsEnum} from 's-n-m-lib';
 
 
 export class Game extends libGame{
     stats:{players:{turns:number,moves:number}[]}={players:[{turns:0,moves:0},{turns:0,moves:0}]};
-    stateEmitter:Subscriber<GameStatesEnum>;  
+    stateEmitter$:Subscriber<GameStatesEnum>;  
+    players:IPlayerModel[];
     lastMoveId:number=0;
     private constructor(){super();}
     
@@ -25,7 +26,7 @@ export class Game extends libGame{
         return g;        
     }
     onStateChange$():Observable<GameStatesEnum>{
-        const o=new Observable<GameStatesEnum>(e => this.stateEmitter = e);
+        const o=new Observable<GameStatesEnum>(e => this.stateEmitter$ = e);
         return o;
     }
     
@@ -41,7 +42,7 @@ export class Game extends libGame{
         }
         if(this.cards[PositionsEnum.PLAYER_PILE+(this.activePlayer*10)].length==0){
             this.state= GameStatesEnum.GAME_OVER;
-            this.stateEmitter.next(this.state);
+            this.stateEmitter$.next(this.state);
         }
         // if(this.cards[PositionsEnum.DECK].length==0){
         //     this.state=GameStatesEnum.DRAW;
@@ -57,7 +58,7 @@ export class Game extends libGame{
 
     outOfCards(){
         console.log(`Out Of Cards`);
-        this.stateEmitter.next(GameStatesEnum.DRAW);
+        this.stateEmitter$.next(GameStatesEnum.DRAW);
         this.state= GameStatesEnum.DRAW;
     }
     toModel():IGameModel{

@@ -26,7 +26,7 @@ export class AuthService {
             const user = await Auth.currentAuthenticatedUser();
             const key:string=`CognitoIdentityServiceProvider.${user.pool.clientId}.${user.username}.idToken`;
             const token = user.storage[key]; 
-            console.log(`AuthService.token:\n${token}`); 
+            // console.log(`AuthService.token:\n${token}`); 
             resolve(token);
         });
     }

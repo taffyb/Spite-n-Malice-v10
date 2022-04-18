@@ -28,39 +28,39 @@ export class MoveRptComponent implements OnInit {
           const gameUuid = val.gameUuid;
           if(gameUuid){
               try{
-                  const game = await gameSvc.getGame$(gameUuid).toPromise(); 
-                  let players = {};
-                  players[game.player1Uuid]=0;
-                  players[game.player2Uuid]=1;
-                  this.moves$= this.moveSvc.getMoves$(gameUuid);
-                  this.moves$.subscribe(
-                      {
-                         next: (moves:IMoveModel[])=>{
-                             const stats={
-                                     moves:[0,0],
-                                     jokers:[0,0],
-                                     turns:[0,0]
-                                    }
-                             moves.forEach((m:IMoveModel)=>{
-//                                 console.log(`Move Id: ${m.id} ${MoveTypesEnum[m.type]} ${m.isDiscard}== ${m.isDiscard===true}`);
-                                 if(m.type == MoveTypesEnum.PLAYER){
-                                     if(String(m.isDiscard)=='true'){
-//                                         console.log(`Discard Move: playerUuid:${m.playerUuid} playerNo:${players[m.playerUuid]} `);
-                                         stats.turns[players[m.playerUuid]]+=1;
-                                     }
-                                     stats.moves[players[m.playerUuid]]+=1;
-                                     if((m.to>=PositionsEnum.STACK_1 && m.to<=PositionsEnum.STACK_1) && m.card==CardsEnum.JOKER){
-                                         stats.jokers[players[m.playerUuid]]+=1;
-                                     }
-                                 }
-                             });
-                             console.log(`${JSON.stringify(stats)}`);
-                             this.stats$=of(stats);
-                             this.report.renderCanvas(this.canvas,moves,game);
-                         },
-                         error:(err)=>{}
-                      }
-                  );
+//                   const game = await gameSvc.getGame$(gameUuid).toPromise(); 
+//                   let players = {};
+//                   players[game.player1Uuid]=0;
+//                   players[game.player2Uuid]=1;
+//                   this.moves$= this.moveSvc.getMoves$(gameUuid);
+//                   this.moves$.subscribe(
+//                       {
+//                          next: (moves:IMoveModel[])=>{
+//                              const stats={
+//                                      moves:[0,0],
+//                                      jokers:[0,0],
+//                                      turns:[0,0]
+//                                     }
+//                              moves.forEach((m:IMoveModel)=>{
+// //                                 console.log(`Move Id: ${m.id} ${MoveTypesEnum[m.type]} ${m.isDiscard}== ${m.isDiscard===true}`);
+//                                  if(m.type == MoveTypesEnum.PLAYER){
+//                                      if(String(m.isDiscard)=='true'){
+// //                                         console.log(`Discard Move: playerUuid:${m.playerUuid} playerNo:${players[m.playerUuid]} `);
+//                                          stats.turns[players[m.playerUuid]]+=1;
+//                                      }
+//                                      stats.moves[players[m.playerUuid]]+=1;
+//                                      if((m.to>=PositionsEnum.STACK_1 && m.to<=PositionsEnum.STACK_1) && m.card==CardsEnum.JOKER){
+//                                          stats.jokers[players[m.playerUuid]]+=1;
+//                                      }
+//                                  }
+//                              });
+//                              console.log(`${JSON.stringify(stats)}`);
+//                              this.stats$=of(stats);
+//                              this.report.renderCanvas(this.canvas,moves,game);
+//                          },
+//                          error:(err)=>{}
+//                       }
+//                   );
               }catch(err){
                   console.error(`catch block ${err} ${JSON.stringify(err)}`);
                   this.router.navigate(['/']);

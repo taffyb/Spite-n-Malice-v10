@@ -42,6 +42,12 @@ export class HomeComponent implements OnInit {
       console.log(`HomeComponent.currentAuthenticatedUser: ${user.username}`);
       
       this.playerSvc.getPlayer$().subscribe(player=>{
+        
+        this.authSvc.getAccessJwtToken()
+        .then(token=>{
+          console.log(`token:\n${token}`);
+          
+        });
         this.playerSvc.setActivePlayer(player.uuid);
         console.log(`HomeComponent.getPlayer$: ${JSON.stringify(player,null,2)}`);
         this.profileSvc.getProfile$().subscribe({
@@ -51,7 +57,7 @@ export class HomeComponent implements OnInit {
         this.games$= this.gameSvc.getGames$(3);
         // this.opponents$=this.playerSvc.getOpponents$(this.player.uuid);
         if(this.authSvc.getAuthStatus()==AuthTypesEnum.AUTHENTICATED){
-          this.wsSvc.connect();
+          // this.wsSvc.connect();
         }
       });
     });         
@@ -59,11 +65,12 @@ export class HomeComponent implements OnInit {
   
   newGame(){
 
-    const g:IGameModel = this.gameSvc.newGame("game", this.playerSvc.getActivePlayer().uuid, "Player2",true);
-    // this.game = g;
-    const url:string = `/play-area/${g.uuid}`;
-    // console.log(`route to new game: ${url}`);
-    this.router.navigate([url]);
+    
+    const g= this.gameSvc.newGame("game", this.playerSvc.getActivePlayer().uuid, "Player2",true);
+    
+    
+        const url:string = `/play-area/${g.uuid}`;
+        this.router.navigate([url]);
   }
   sendInvite(opponent:IPlayerModel){
       console.log(`Asking ${opponent.name} to play a game`);
