@@ -11,6 +11,7 @@ import {GameService} from '../services/game.service';
 import {AuthService} from '../services/auth.service';
 import {AuthTypesEnum} from '../classes/auth.enums';
 import { Auth } from 'aws-amplify';
+import { environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-splash',
@@ -18,6 +19,7 @@ import { Auth } from 'aws-amplify';
   styleUrls: ['./splash.component.css']
 })
 export class SplashComponent implements OnInit {
+  env=environment;
   @Output()onLogin:EventEmitter<IPlayerModel> = new EventEmitter<IPlayerModel>();
   
   constructor(

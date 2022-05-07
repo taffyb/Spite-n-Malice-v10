@@ -3,7 +3,9 @@ Written by Taffy Brecknock<p>
 <p>
 <div class="link" (click)="guestEntry()">Play local with both players using the same browser</div>
 <p>
+<span *ngIf="!env.production">
 or 
 <p>
-<div class="link" (click)="login()">login</div> 
+<div class="link"  (click)="login()">login</div> 
 <p>
+</span>
