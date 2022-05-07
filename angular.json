@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Spite-Malice-v9": {
+    "Spite-Malice-v10": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/Spite-Malice-v9",
+            "outputPath": "dist/Spite-Malice-v10",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -63,18 +63,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "Spite-Malice-v9:build"
+            "browserTarget": "Spite-Malice-v10:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "Spite-Malice-v9:build:production"
+              "browserTarget": "Spite-Malice-v10:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "Spite-Malice-v9:build"
+            "browserTarget": "Spite-Malice-v10:build"
           }
         },
         "test": {
@@ -112,16 +112,16 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "Spite-Malice-v9:serve"
+            "devServerTarget": "Spite-Malice-v10:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "Spite-Malice-v9:serve:production"
+              "devServerTarget": "Spite-Malice-v10:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "Spite-Malice-v9"
+  "defaultProject": "Spite-Malice-v10"
 }

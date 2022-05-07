@@ -30,10 +30,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'Spite-Malice-v9'`, () => {
+  it(`should have as title 'Spite-Malice-v10'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('Spite-Malice-v9');
+    expect(app.title).toEqual('Spite-Malice-v10');
   });
 
 });

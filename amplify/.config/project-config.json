@@ -6,7 +6,7 @@
     "framework": "angular",
     "config": {
       "SourceDir": "src",
-      "DistributionDir": "dist/Spite-Malice-v9",
+      "DistributionDir": "dist/Spite-Malice-v10",
       "BuildCommand": "npm.cmd run-script build",
       "StartCommand": "ng serve"
     }
