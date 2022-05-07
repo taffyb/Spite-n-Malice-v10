@@ -9,6 +9,7 @@ import {environment} from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { CognitoUserSession, CognitoIdToken } from 'amazon-cognito-identity-js'
 import { AuthTypesEnum } from '../classes/auth.enums';
+import { AST } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -52,16 +53,19 @@ export class ProfileService {
   saveProfile(profile:IProfileModel){ 
     console.log(`saveProfile`);  
     this._profile = profile;
-    this.authSvc.getAccessJwtToken()
-    .then(token=>{
-      const headers= new HttpHeaders()
-          .set('Authorization', token);       
-        const url = `${environment.apiGateway}/players/profile`;
-        this.http.put<any>(url,profile,{'headers':headers}).subscribe((res)=>{
-          // console.log(`RESPONSE: ${JSON.stringify(res)}`);
-          null; //if we don't subscribe the http call is not made
-        });
-    });
+    const status:AuthTypesEnum = this.authSvc.getAuthStatus();
+    if(status==AuthTypesEnum.AUTHENTICATED){
+      this.authSvc.getAccessJwtToken()
+      .then(token=>{
+        const headers= new HttpHeaders()
+            .set('Authorization', token);       
+          const url = `${environment.apiGateway}/players/profile`;
+          this.http.put<any>(url,profile,{'headers':headers}).subscribe((res)=>{
+            // console.log(`RESPONSE: ${JSON.stringify(res)}`);
+            null; //if we don't subscribe the http call is not made
+          });
+      });
+    }
   }
   getDefaultProfile$():Observable<IProfileModel>{
       this._profile=DEFAULT_PROFILE;

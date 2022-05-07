@@ -68,7 +68,7 @@ export class MoveService{
         const url =  `${common.endpoint}/games/${gameUuid}/moves`;
             this.http.put<IMoveModel>(url,ms).subscribe(
                 (val) => {
-                    console.log(`POST call successful value returned in body ${JSON.stringify(val)}`);
+                    console.log(`PUT saveMoves call successful value returned in body ${JSON.stringify(val)}`);
                 },
                 response => {
                     if(response.status != 200){

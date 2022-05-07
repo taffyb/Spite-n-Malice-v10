@@ -1,7 +1,6 @@
 import { Component, Inject, Optional,  OnInit } from '@angular/core'; 
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {IProfileModel,DEFAULT_PROFILE} from 's-n-m-lib';
-//import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profile-dialog',
@@ -10,7 +9,6 @@ import {IProfileModel,DEFAULT_PROFILE} from 's-n-m-lib';
 })
 export class ProfileDialogComponent implements OnInit {
    profile:IProfileModel=DEFAULT_PROFILE;
-//   profile:IProfileModel;
   
   constructor(
           public dialogRef: MatDialogRef<ProfileDialogComponent>,

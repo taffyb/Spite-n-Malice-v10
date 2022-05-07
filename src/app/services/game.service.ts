@@ -120,6 +120,7 @@ export class GameService{
         const game:Game=Game.fromModel(g);
         this._games[game.uuid]=game;
         this.statusChanged.next({status:GameStatesEnum.NEW,game:game});
+        this.saveGame(game);
         return game;
     }
     saveGame(game:IGameModel){
