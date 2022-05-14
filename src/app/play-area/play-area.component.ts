@@ -116,6 +116,12 @@ export class PlayAreaComponent implements OnInit {
                 });   
                 this.gameSvc.getGame(gameUuid);
                 this.profile = this.profileSvc.getActiveProfile(); 
+                this.profileSvc.profile$.subscribe({
+                    next:(p)=>{this.profile=p;},
+                    error:err=>{
+                        console.error(`Error profile$ ${JSON.stringify(err)}`);
+                    }
+                });
 
             }catch(err){
                 console.error(`catch block ${err} ${JSON.stringify(err)}`);

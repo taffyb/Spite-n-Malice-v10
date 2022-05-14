@@ -203,9 +203,9 @@
 		
 		<ng-template #loadingHand><p>Loading players hands...</p></ng-template>
 	</div>
-	<!-- <div id="game-explorer" *ngIf="message.length<=0">
+	<div id="game-explorer" *ngIf="message.length<=0 && profile.showExplorer">
 		<app-game-explorer [game]="game"></app-game-explorer>
-	</div> -->
+	</div>
 </div>
 
 <ng-template #noGame>NO GAME</ng-template>

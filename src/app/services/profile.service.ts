@@ -5,7 +5,7 @@ import { map, catchError, tap } from 'rxjs/operators';
 
 import {IProfileModel,DEFAULT_PROFILE,IPlayerModel} from 's-n-m-lib';
 import {Location, TimeZone} from '../classes/timezones'
-import {environment} from '../../environments/environment';
+import {environment as env} from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { CognitoUserSession, CognitoIdToken } from 'amazon-cognito-identity-js'
 import { AuthTypesEnum } from '../classes/auth.enums';
@@ -17,20 +17,24 @@ import { AST } from '@angular/compiler';
 export class ProfileService {
   private _profile:IProfileModel = DEFAULT_PROFILE;
   private playerGuid:string;
+  public profile$:Subject<IProfileModel> = new Subject<IProfileModel>();
 
 
   constructor(private http:HttpClient,
               private authSvc:AuthService) { }
   
   getActiveProfile():IProfileModel{
-    console.log(`getActiveProfile:${JSON.stringify(this._profile,null,2)}`);
+    console.log(`getActiveProfile: isProduction ${env.production} isDebugging ${env.debugging}`);
+    if(!env.production==true && env.debugging==true ){
+     this._profile['showExplorer']=true;
+  }
       return this._profile;
   }
   getProfile$():Observable<IProfileModel>{  
     console.log(`getProfile$`);  
     const result:Subject<IProfileModel> = new Subject<IProfileModel>();
     if(this.authSvc.getAuthStatus()==AuthTypesEnum.AUTHENTICATED){
-      const url = `${environment.apiGateway}/players/profile`;
+      const url = `${env.apiGateway}/players/profile`;
       this.authSvc.getAccessJwtToken()
       .then(token=>{
         const headers= new HttpHeaders()
@@ -59,41 +63,21 @@ export class ProfileService {
       .then(token=>{
         const headers= new HttpHeaders()
             .set('Authorization', token);       
-          const url = `${environment.apiGateway}/players/profile`;
+          const url = `${env.apiGateway}/players/profile`;
           this.http.put<any>(url,profile,{'headers':headers}).subscribe((res)=>{
             // console.log(`RESPONSE: ${JSON.stringify(res)}`);
             null; //if we don't subscribe the http call is not made
           });
       });
     }
+    this.profile$.next(profile);
   }
   getDefaultProfile$():Observable<IProfileModel>{
       this._profile=DEFAULT_PROFILE;
-      // this._profile.showStatistics=false;
+      if(!env.production==true && env.debugging==true){
+       this._profile['showExplorer']=true;
+    }
       return of(this._profile);
   }
   
-  // getLocations$():Observable<Location[]>{
-  //     const url = `http://worldtimeapi.org/api/timezone`;
-  //     console.log(`getLocations$: ${url}`);
-  //     return this.http.get<string[]>(url).pipe(
-  //        map((locations)=>{
-  //            console.log(`Locations: ${JSON.stringify(locations)}`);
-  //             const locs:Location[]=[];
-  //             locations.forEach(l=>{
-  //                 locs.push(new Location(l));
-  //             });          
-  //             return locs;
-  //         })
-  //     );
-  // }
-  // getTimeZone$(loc:Location):Observable<TimeZone>{
-  //     const url = `http://worldtimeapi.org/api/timezone/${loc.area()}/${loc.location()}/${loc.region()}`;
-  //     console.log(`getTimeZones$: ${url}`);
-  //     return this.http.get<TimeZone>(url).pipe(
-  //         tap((tz)=>{
-  //            console.log(`getTimeZone$:${JSON.stringify(tz)}`);     
-  //         })
-  //     );
-  // }
 }

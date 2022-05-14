@@ -8,7 +8,7 @@ import { PlayerService} from '../services/player.service';
 import { GameService} from '../services/game.service';
 import { Auth } from 'aws-amplify';
 import { Router, NavigationStart } from '@angular/router';
-import { environment} from '../../environments/environment';
+import { environment as env} from '../../environments/environment';
 import { Game } from '../classes/games';
 
 @Component({
@@ -20,7 +20,7 @@ export class BurgerMenuComponent implements OnInit {
   @Input()player:IPlayerModel;
   profile;
   game$;
-  debugging:boolean = ('debugging' in environment);
+  debugging:boolean = (env.debugging);
     
   constructor(
     private router: Router,
@@ -31,6 +31,7 @@ export class BurgerMenuComponent implements OnInit {
 
   ngOnInit() {
     this.game$=this.gameSvc.game$;
+    
   }
 
   onSettings(){
@@ -61,31 +62,34 @@ export class BurgerMenuComponent implements OnInit {
         });
   }
   onShowCards(){
-    let gameUuid = prompt("Enter GameUUID");
-    this.game$().subscribe({
-      next:(game)=>{
-        let out:string="["
-        for(let pos:number=PositionsEnum.PLAYER_PILE;pos<=PositionsEnum.RECYCLE;pos++){
-          out+="[";
-          for(let c:number=0;c<game.cards[pos].length;c++){
-            out+=game.cards[pos][c].cardNo;
-            if(c<game.cards[pos].length-1){
-              out+=",";
+      if(this.debugging){
+      let gameUuid = prompt("Enter GameUUID");
+      this.game$.subscribe({
+        next:(game)=>{
+          let out:string="["
+          for(let pos:number=PositionsEnum.PLAYER_PILE;pos<=PositionsEnum.RECYCLE;pos++){
+            out+="[";
+            for(let c:number=0;c<game.cards[pos].length;c++){
+              out+=game.cards[pos][c].cardNo;
+              if(c<game.cards[pos].length-1){
+                out+=",";
+              }
+            }
+            out+="]";
+            if(pos<PositionsEnum.RECYCLE){
+              out+=",\n";
             }
           }
           out+="]";
-          if(pos<PositionsEnum.RECYCLE){
-            out+=",\n";
-          }
-        }
-        out+="]";
-        console.log(`${out}`);
-      },
-      error:(err)=>{console.error(`${err}`)}
-    });
-    this.gameSvc.getGame(gameUuid);
+          console.log(`${out}`);
+        },
+        error:(err)=>{console.error(`${err}`)}
+      });
+      this.gameSvc.getGame(gameUuid);
+    }
   }
   onShowGame(){
+    if(this.debugging){
     let gameUuid = prompt("Enter GameUUID");
     this.game$.subscribe({
       next:(game:Game)=>{
@@ -96,7 +100,9 @@ export class BurgerMenuComponent implements OnInit {
     });
     this.gameSvc.getGame(gameUuid);
   }
+  }
   onSetCards(){
+    if(this.debugging){
     const gameUUID:string = prompt("enter Game UUID");
     const cardsStr:string =prompt("enter cards array");
     console.log(cardsStr);
@@ -112,6 +118,7 @@ export class BurgerMenuComponent implements OnInit {
     }
     console.log(`${JSON.stringify(cards)}`);
     this.gameSvc.setGame(gameUUID,cards);
+  }
   }
   onSignOut(){
     Auth.signOut()
