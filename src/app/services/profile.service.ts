@@ -25,9 +25,9 @@ export class ProfileService {
   
   getActiveProfile():IProfileModel{
     console.log(`getActiveProfile: isProduction ${env.production} isDebugging ${env.debugging}`);
-    if(!env.production==true && env.debugging==true ){
-     this._profile['showExplorer']=true;
-  }
+  //   if(!env.production==true && env.debugging==true ){
+  //    this._profile['showExplorer']=true;
+  // }
       return this._profile;
   }
   getProfile$():Observable<IProfileModel>{  
@@ -74,7 +74,9 @@ export class ProfileService {
   }
   getDefaultProfile$():Observable<IProfileModel>{
       this._profile=DEFAULT_PROFILE;
+      this._profile['sideBySide']=false;
       if(!env.production==true && env.debugging==true){
+
        this._profile['showExplorer']=true;
     }
       return of(this._profile);

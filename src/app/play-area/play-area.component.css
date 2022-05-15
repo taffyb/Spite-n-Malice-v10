@@ -20,10 +20,13 @@
 	border:solid black 1px;
 }
 .heading.active{
-	background:#44d60b;
+	background:#93df74;
 }
 .heading.inactive{
-	background:#a31217;
+	background:#e1393e;
+}
+.side-by-side{
+	float: left;
 }
 .player{
 	display:inline-flex;

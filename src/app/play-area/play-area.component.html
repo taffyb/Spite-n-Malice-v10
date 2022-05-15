@@ -48,10 +48,10 @@
 			</table>
 		<!-- </div> -->
 		<ng-template #loading>Loading statistics</ng-template>
-		<!-- <div *ngIf="(players$ | async) as players; else loadingHand"> -->
-			<div *ngIf="players[0];let player ">
-				 {{player.name}}<br>
-				<div *ngIf="1; let pIdx">
+		<div>
+			<div [ngClass]="{'side-by-side':profile.sideBySide}">
+				<p *ngIf="players[0];let player "> {{player.name}}</p>
+				<div *ngIf="1; let pIdx" >
 					<div class="player">
 						<div class="container">
 							<div  class="heading" [ngClass]="{'active':game.activePlayer==(pIdx-1),
@@ -107,42 +107,9 @@
 					</div>
 				</div>
 			</div>
-		<!-- </div> -->
-		<div>	
-			<div class="game-row">
-				<div class="game-deck tooltip" >
-					<span class="tooltiptext">{{game.getCards(pE.DECK).length}}</span>
-					<app-pile 			
-						id="pos{{pE.DECK}}"	
-						[pos]="pE.DECK"
-						[cards]="game.getCards(pE.DECK)"
-						[options]="getOptions(pE.DECK)">
-					</app-pile>
-				</div>		
-				<div class="game-recycle tooltip" >
-					<span *ngIf="game.getCards(pE.RECYCLE).length>0" 
-						class="tooltiptext">{{game.getCards(pE.RECYCLE).length}}</span>
-					<app-pile 				
-						id="pos{{pE.RECYCLE}}"			
-						[pos]="pE.RECYCLE"
-						[cards]="game.getCards(pE.RECYCLE)"
-						[options]="getOptions(pE.RECYCLE)">
-					</app-pile>			 
-				</div>
-				<div class="game-stacks">
-					<app-game-pile *ngFor="let i of [0,1,2,3]"
-						id="pos{{pE.STACK_1+i}}"			
-						[pos]="pE.STACK_1+i"
-						[cards]="game.getCards(pE.STACK_1+i)"
-						[options]="getOptions(pE.STACK_1+i)"
-						(onSelect)="select($event)">
-					</app-game-pile>
-				</div>		
-			</div>
-		</div>		
-		<!-- <div *ngIf="(players$ | async) as players; else loadingHand"> -->
-			<div *ngIf="players[1];let player ">
-				{{player.name}}<br>
+			<div *ngIf="profile.sideBySide"  >
+				<br>
+				<p *ngIf="players[1];let player ">{{player.name}}</p>
 				<div *ngIf="2; let pIdx">
 					<div class="player">
 						<div class="container">
@@ -198,7 +165,99 @@
 						</div>
 					</div>
 				</div>
-			<!-- </div> -->
+			</div>				
+		</div>
+		<div>	
+			<div class="game-row">
+				<div class="game-deck tooltip" >
+					<span class="tooltiptext">{{game.getCards(pE.DECK).length}}</span>
+					<app-pile 			
+						id="pos{{pE.DECK}}"	
+						[pos]="pE.DECK"
+						[cards]="game.getCards(pE.DECK)"
+						[options]="getOptions(pE.DECK)">
+					</app-pile>
+				</div>		
+				<div class="game-recycle tooltip" >
+					<span *ngIf="game.getCards(pE.RECYCLE).length>0" 
+						class="tooltiptext">{{game.getCards(pE.RECYCLE).length}}</span>
+					<app-pile 				
+						id="pos{{pE.RECYCLE}}"			
+						[pos]="pE.RECYCLE"
+						[cards]="game.getCards(pE.RECYCLE)"
+						[options]="getOptions(pE.RECYCLE)">
+					</app-pile>			 
+				</div>
+				<div class="game-stacks">
+					<app-game-pile *ngFor="let i of [0,1,2,3]"
+						id="pos{{pE.STACK_1+i}}"			
+						[pos]="pE.STACK_1+i"
+						[cards]="game.getCards(pE.STACK_1+i)"
+						[options]="getOptions(pE.STACK_1+i)"
+						(onSelect)="select($event)">
+					</app-game-pile>
+				</div>		
+			</div>
+		</div>		
+		<div *ngIf="!profile.sideBySide">
+			<div >
+				<p *ngIf="players[1];let player ">{{player.name}}</p>
+				<div *ngIf="2; let pIdx">
+					<div class="player">
+						<div class="container">
+							<div  class="heading" [ngClass]="{'active':game.activePlayer==(pIdx-1),
+									'inactive':game.activePlayer!=(pIdx-1)}">Pile</div>
+							<div class="player-pile tooltip" >
+								<span class="tooltiptext">{{game.getCards(pE.PLAYER_PILE+(pPE.PLAYER_2*(pIdx-1))).length}}</span>
+								<app-pile 
+									id="pos{{pE.PLAYER_PILE+(pPE.PLAYER_2*(pIdx-1))}}"
+									[pos]="pE.PLAYER_PILE+(pPE.PLAYER_2*(pIdx-1))"
+									[cards]="game.getCards(pE.PLAYER_PILE+(pPE.PLAYER_2*(pIdx-1)))"
+									[options]="getOptions(pE.PLAYER_PILE+(pPE.PLAYER_2*(pIdx-1)))"
+									(onSelect)="select($event)">
+								</app-pile>
+							</div>
+						</div>
+						<div class="container">
+							<div  class="heading" [ngClass]="{'active':game.activePlayer==(pIdx-1),
+									'inactive':game.activePlayer!=(pIdx-1)}">Hand</div>
+							<div class="player-hand">
+								<ng-container *ngIf="isActivePlayer((pIdx-1)); else InActivePlayer">
+									<app-pile *ngFor="let i of [0,1,2,3,4]"	
+										id="pos{{pE.PLAYER_HAND_1+i+(pPE.PLAYER_2*(pIdx-1))}}"
+										[pos]="pE.PLAYER_HAND_1+i+(pPE.PLAYER_2*(pIdx-1))"
+										[cards]="game.getCards(pE.PLAYER_HAND_1+i+(pPE.PLAYER_2*(pIdx-1)))"
+										[options]="getOptions(pE.PLAYER_HAND_1+i+(pPE.PLAYER_2*(pIdx-1)))"
+										(onSelect)="select($event)">
+									</app-pile>
+								</ng-container>
+								<ng-template #InActivePlayer>
+									<app-pile *ngFor="let i of [0,1,2,3,4]"	
+										id="pos{{pE.PLAYER_HAND_1+i+(pPE.PLAYER_2*(pIdx-1))}}"
+										[pos]="pE.PLAYER_HAND_1+i+(pPE.PLAYER_2*(pIdx-1))"			
+										[cards]="game.getCards(pE.PLAYER_HAND_1+i+(pPE.PLAYER_2*(pIdx-1))).length>0?
+													[{cardNo:cE.BACK,position:i+30}]:[]"
+										[options]="getOptions(pE.PLAYER_HAND_1+i+(pPE.PLAYER_2*(pIdx-1)))"
+										(onSelect)="select($event)">
+									</app-pile>
+								</ng-template>
+							</div>
+						</div>			
+						<div class="container">
+							<div class="heading"  [ngClass]="{'active':game.activePlayer==(pIdx-1),
+									'inactive':game.activePlayer!=(pIdx-1)}">Stacks</div>	
+							<div class="player-stacks">
+								<app-player-stack *ngFor="let i of [0,1,2,3]"
+									[pos]="pE.PLAYER_STACK_1+i+(pPE.PLAYER_2*(pIdx-1))" 
+									[cards]="game.getCards(pE.PLAYER_STACK_1+i+(pPE.PLAYER_2*(pIdx-1)))" 
+									[options]="getOptions(pE.PLAYER_STACK_1+i+(pPE.PLAYER_2*(pIdx-1)))"
+									(onSelect)="select($event)">
+								</app-player-stack>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		
 		<ng-template #loadingHand><p>Loading players hands...</p></ng-template>
