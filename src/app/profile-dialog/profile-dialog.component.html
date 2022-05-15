@@ -62,7 +62,8 @@
         	<mat-checkbox [checked]="profile.showStatistics" (change)="profile.showStatistics = $event.checked">Show Statistics</mat-checkbox>
         </div>
     </mat-tab>
-	<mat-tab label="Display">
+	<mat-tab *ngIf="true" label="Display"> 
+		<!-- the *ngIf="true" is a hack to prevent a compile time warning about sideBySide not being a true property on IProfileModel-->
 	  <div class="tab-content">
 		  <mat-checkbox [checked]="profile.sideBySide" (change)="profile.sideBySide = $event.checked">Display Side By Side</mat-checkbox>
 	  </div>
